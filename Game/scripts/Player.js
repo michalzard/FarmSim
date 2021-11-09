@@ -1,7 +1,8 @@
 import {RectangleCollider} from "./PhysicsObjects.js";
-import { Sprite } from "./Sprite.js";
 import Canvas from "./Canvas.js";
 import Renderer from "./Renderer.js";
+import SpriteSheet from "./SpritesheetHandler.js";
+
 
 const ctx=Canvas.ctx;
 const Body=Matter.Body,
@@ -20,10 +21,10 @@ export default class Player{
         }
         this.maxSpeed=5;
         this.collider=new RectangleCollider(world,this.position,this.size,false);
-        // this.texture=new Sprite("./assets/test.png",40,60);
-        // this.texture.dest.x=210;this.texture.dest.y=160;
+        this.texture=new SpriteSheet("./assets/testsheet.jpg",this.size);
         Body.setInertia(this.collider,Infinity);
-        Renderer.addToLayer(this,"entities");
+
+        Renderer.addToLayer(p,"entities");
         //listeners
         window.addEventListener("keydown",(e)=>{this.handleKeyDown(e)});
         window.addEventListener("keyup",(e)=>{this.handleKeyUp(e)});
@@ -31,8 +32,13 @@ export default class Player{
     draw(){
     this.updatePosition();
     this.collider.draw(ctx);
-    if(this.texture)this.texture.draw(ctx,this.collider.body.position);
+
+    if(this.texture){
+        this.texture.update(this.collider.body.position,this.collider.body.angle);
+        this.texture.draw(ctx);
     }
+    }
+ 
     updatePosition(){
     Body.setVelocity(this.collider.body,{x:0,y:0});
     if(this.input.up) Body.setVelocity(this.collider.body,{x:this.collider.body.velocity.x,y:-this.maxSpeed});
