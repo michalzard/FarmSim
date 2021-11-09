@@ -8,26 +8,25 @@ export default class Renderer{
         env:[],
         buildings:[],
         entities:[],
+        debug:[],
     };
-    
     static render(){
         ctx.clearRect(0,0,Canvas.width,Canvas.height);
         for(let i=0;i<Renderer.layers.entities.length;i++){
             const objectLayer=Renderer.layers.entities;
             objectLayer[i].draw();
         }
-        
         window.requestAnimationFrame(Renderer.render);
     }
-    static addToLayer(entity,layer){
+    static addToLayer(entity,layerName){
     const layers=Object.entries(Renderer.layers)
     for(let i=0;i<layers.length;i++){
-        if(layers[i].includes(layer.toLowerCase())){
+
+        if(layers[i].includes(layerName.toLowerCase())){
         const foundLayer=layers[i];
         const layerArray=foundLayer[1];
-        if(layerArray) layerArray.push(entity); 
-        }
+        if(layerArray)layerArray.push(entity);
+    }
     }
     }
 }
-
