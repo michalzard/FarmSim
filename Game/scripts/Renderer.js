@@ -5,16 +5,28 @@ const ctx=Canvas.ctx;
 /** temporary solution */
 export default class Renderer{
     static layers={
+        background:[],
         env:[],
         buildings:[],
         entities:[],
-        debug:[],
     };
     static render(){
         ctx.clearRect(0,0,Canvas.width,Canvas.height);
+        for(let i=0;i<Renderer.layers.background.length;i++){
+            const objectLayer=Renderer.layers.background;
+            objectLayer[i].draw(ctx);
+        }
+        for(let i=0;i<Renderer.layers.env.length;i++){
+            const objectLayer=Renderer.layers.env;
+            objectLayer[i].draw(ctx);
+        }
+        for(let i=0;i<Renderer.layers.buildings.length;i++){
+            const objectLayer=Renderer.layers.buildings;
+            objectLayer[i].draw(ctx);
+        }
         for(let i=0;i<Renderer.layers.entities.length;i++){
             const objectLayer=Renderer.layers.entities;
-            objectLayer[i].draw();
+            objectLayer[i].draw(ctx);
         }
         window.requestAnimationFrame(Renderer.render);
     }
