@@ -2,18 +2,17 @@ const { app, BrowserWindow,screen} = require('electron')
 require('dotenv').config();
 
 function createWindow () {
-  const win = new BrowserWindow({
-    width: screen.getPrimaryDisplay().size.width || 1920,
-    height: screen.getPrimaryDisplay().size.height || 1080,
+  const gameWindow = new BrowserWindow({
+    width:screen.getPrimaryDisplay().size.width || 1080,
+    height:screen.getPrimaryDisplay().size.height || 720,
     webPreferences:{
     devTools:process.env.ENV_MODE==="DEBUG" ? true : false,
     },
-    fullscreen:true,
-    frame:false,
+    fullscreen:false,
+    frame:process.env.ENV_MODE==="DEBUG" ? true : false,
     
 });
-
-win.loadFile('../Game/index.html');
+gameWindow.loadFile('../Game/index.html');
 }
 
 app.whenReady().then(() => {
