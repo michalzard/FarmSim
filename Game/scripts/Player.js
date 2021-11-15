@@ -3,7 +3,6 @@ import Canvas from "./Canvas.js";
 import Renderer from "./Renderer.js";
 import SpriteSheet from "./SpritesheetHandler.js";
 
-
 const ctx=Canvas.ctx;
 const Body=Matter.Body,
 Vector=Matter.Vector;
@@ -21,10 +20,10 @@ export default class Player{
         }
         this.maxSpeed=5;
         this.collider=new RectangleCollider(world,this.position,this.size,false);
-        this.texture=new SpriteSheet("./assets/testsheet.jpg",this.size);
+        //this.texture=new SpriteSheet("./assets/testsheet.jpg",this.size);
         Body.setInertia(this.collider,Infinity);
 
-        Renderer.addToLayer(p,"entities");
+        Renderer.addToLayer(this,"entities");
         //listeners
         window.addEventListener("keydown",(e)=>{this.handleKeyDown(e)});
         window.addEventListener("keyup",(e)=>{this.handleKeyUp(e)});
@@ -40,12 +39,13 @@ export default class Player{
     }
  
     updatePosition(){
+    if(this.collider.body){
     Body.setVelocity(this.collider.body,{x:0,y:0});
     if(this.input.up) Body.setVelocity(this.collider.body,{x:this.collider.body.velocity.x,y:-this.maxSpeed});
     if(this.input.left) Body.setVelocity(this.collider.body,{x:-this.maxSpeed,y:this.collider.body.velocity.y});
     if(this.input.down) Body.setVelocity(this.collider.body,{x:this.collider.body.velocity.x,y:this.maxSpeed});
     if(this.input.right) Body.setVelocity(this.collider.body,{x:this.maxSpeed,y:this.collider.body.velocity.y});
-    }
+    }}
     handleKeyDown(e){
     if(e.key==="w"){this.input.up=true;}
     if(e.key==="s"){this.input.down=true;}
