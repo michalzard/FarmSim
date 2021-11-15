@@ -11,8 +11,8 @@ export default class SpriteSheet{
     this.img=new Image();
     this.img.src=imageSrc || null;
     this.position=Vector.create(0,0);
-    this.size=size || Vector.create(32,32); //size of the texture
-    this.frameSize=Vector.create(64,64); //cut out
+    this.size=size || Vector.create(40,40); //size of the texture
+    this.frameSize=Vector.create(32,32); //cut out
     this.frameOffset=Vector.create(0,0);//adds aditional pixels to cut out
     this.angle=0;
     this.startingFrame=0;//offset to start on specific frame
@@ -23,8 +23,6 @@ export default class SpriteSheet{
     //inital setup for sprite looping
     this.loopTimestep=100;
     this.loop(this.loopTimestep);
-    
-    Renderer.addToLayer(this,"debug");
     }
 
     draw(ctx){
