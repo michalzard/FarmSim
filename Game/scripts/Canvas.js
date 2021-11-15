@@ -19,3 +19,11 @@ export default class Canvas{
 
 }
 
+export class Mouse {
+    static position={x:0,y:0};
+    static updatePosition(e){
+    this.position={x:e.clientX,y:e.clientY};
+    }
+}
+
+window.addEventListener("mousemove",(e)=>{Mouse.updatePosition(e);});
