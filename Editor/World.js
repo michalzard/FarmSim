@@ -5,7 +5,7 @@ import Renderer from "../Game/scripts/Renderer.js";
 
 export default class WorldEditor{
     
-    static sprites=[];
+    static availableSprites=[];
 
     static grid={
         size:40,//40x40
@@ -20,32 +20,12 @@ export default class WorldEditor{
      *  initializes spritesheets so textures can be used
      * @param {*} sprite can pass single sprite or array of sprites  
      */
-    static loadSprites(sprite,category){
+    static addSprites(sprite,category){
         if(Array.isArray(sprite))
-        this.sprites.push({textures:[...sprite],category});
-        else this.sprites.push({textures:[sprite],category});
-    }
-    /**
-     * adds tile to renderer to display said tile
-     * @param {*} tile spritesheet instance with specific cutout dimension
-     */
-    static addTile(tile){
-        if(tile instanceof SpriteSheet){
-        tile.position=this.translateToGrid(tile.position);
-        Renderer.addToLayer(tile,"background");
-        }else return;
+        this.availableSprites.push({textures:[...sprite]});
+        else this.availableSprites.push({textures:[sprite],category});
     }
 
 }
 
-
-const grassSheet=new SpriteSheet("../Game/assets/grassdirt.png",Vector.create(40,40));
-const dirtSheet=new SpriteSheet("../Game/assets/grassdirt.png",Vector.create(40,40));
-grassSheet.position=Vector.create(50,50);
-WorldEditor.loadSprites([grassSheet,dirtSheet],'grass');
-WorldEditor.loadSprites(dirtSheet,'dirt');
-
-WorldEditor.addTile(grassSheet);
-
-//TODO:create tile object that holds its own position,texture and all of that
-//so that it can be pushed into renderer so i can create worlds quickly trough editor
+console.log(WorldEditor.availableSprites);
