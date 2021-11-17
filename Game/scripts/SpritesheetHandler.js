@@ -1,17 +1,15 @@
 /**
  * Everything related to sprites,spritesheets and image maninpulation
  */
-import Renderer from "./Renderer.js";
-
 const Vector=Matter.Vector;
 
 
 export default class SpriteSheet{
-    constructor(imageSrc,size){
+    constructor(imageSrc){
     this.img=new Image();
     this.img.src=imageSrc || null;
     this.position=Vector.create(0,0);
-    this.size=size || Vector.create(40,40); //size of the texture
+    this.size=Vector.create(40,40); //size of the texture
     this.frameSize=Vector.create(32,32); //cut out
     this.frameOffset=Vector.create(0,0);//adds aditional pixels to cut out
     this.angle=0;
@@ -61,4 +59,5 @@ export default class SpriteSheet{
     }
 
 }
+
 
