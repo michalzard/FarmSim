@@ -9,7 +9,7 @@ function createWindow () {
     webPreferences:{
     devTools:process.env.ENV_MODE==="DEBUG" ? true : false,
     },
-    fullscreen:false,
+    fullscreen:true,
     frame:process.env.ENV_MODE==="DEBUG" ? true : false,    
 });
 gameWindow.loadFile('../Game/index.html');
