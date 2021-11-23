@@ -10,7 +10,7 @@ export default class SpriteSheet{
     this.img.src=imageSrc || null;
     this.position=Vector.create(0,0);
     this.size=Vector.create(40,40); //size of the texture
-    this.frameSize=Vector.create(32,32); //cut out
+    this.frameSize=Vector.create(16,16); //cut out
     this.frameOffset=Vector.create(0,0);//adds aditional pixels to cut out
     this.angle=0;
     this.startingFrame=0;//offset to start on specific frame
