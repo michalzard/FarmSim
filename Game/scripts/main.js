@@ -1,6 +1,6 @@
 import Renderer from "./Renderer.js";
 import Player from "./Player.js";
-import UI from "./UserInterface.js";
+
 // module aliases
 let Engine = Matter.Engine,
     Vector = Matter.Vector,
@@ -16,5 +16,3 @@ Runner.run(runner, engine);
 
 Renderer.render();//requestAnimationFrame 
 Player.init(engine.world);
-
-UI.drawAll();
