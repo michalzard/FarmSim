@@ -1,3 +1,5 @@
+const Vector=Matter.Vector;
+
 export default class Canvas{
     static width;
     static height;
@@ -14,16 +16,42 @@ export default class Canvas{
         document.body.appendChild(Canvas.element);
     }
     static resize(){
-
+        //actual canvas element appended to body
+        Canvas.element.width=window.innerWidth;
+        Canvas.element.height=window.innerHeight;
+        //this is used by renderer to rendder into canvas
+        Canvas.width=window.innerWidth;
+        Canvas.height=window.innerHeight;
     }
 
 }
+window.addEventListener("resize",()=>{Canvas.resize()});
+
+
 
 export class Mouse {
-    static position={x:0,y:0};
+    static position=Vector.create(0,0);
+    static button={left:false,right:false}
     static updatePosition(e){
-    this.position={x:e.clientX,y:e.clientY};
+    this.position=Vector.create(e.clientX,e.clientY);
+    }
+    static getDeta(e){
+    return e.deltaY/100;
+    }
+    static checkBoxCollision(position,size){
+    return (this.position.x >= position.x && this.position.y>=position.y && this.position.x<position.x+size.x && this.position.y<position.y+size.y);
+    }
+    static onButtonDown(e){
+    if(e.which===1)this.button.left=true;
+    if(e.which===3)this.button.right=true;
+    }
+    
+    static onButtonUp(e){
+        if(e.which===1)this.button.left=false;
+        if(e.which===3)this.button.right=false;
     }
 }
+window.addEventListener("mousedown",(e)=>{Mouse.onButtonDown(e);});
+window.addEventListener("mouseup",(e)=>{Mouse.onButtonUp(e);});
 
 window.addEventListener("mousemove",(e)=>{Mouse.updatePosition(e);});
