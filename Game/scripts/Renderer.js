@@ -46,7 +46,7 @@ export default class Renderer{
         if(Renderer.layers.ui.length>0){
             for(let i=0;i<Renderer.layers.ui.length;i++){
                 const objectLayer=Renderer.layers.ui;
-                objectLayer[i].draw(ctx);
+                if(objectLayer[i].opened) objectLayer[i].draw(ctx);
         }}
         window.requestAnimationFrame(Renderer.render);
     }
