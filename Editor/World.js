@@ -1,11 +1,12 @@
 const Vector=Matter.Vector;
-import {Tile} from "../Game/scripts/Tile.js";
+import {Tile} from "../Game/scripts/Objects.js";
 import SpriteSheet from "../Game/scripts/SpritesheetHandler.js";
 import Canvas, { Mouse } from "../Game/scripts/Canvas.js";
 
 export default class WorldEditor{
     
     static availableTiles=[];
+    static defaultAvailableTiles=[];
     static maxSlots=36;
     static slots={
         init:()=>{
@@ -42,9 +43,17 @@ export default class WorldEditor{
      */
     static addTiles(tile,category){
         this.availableTiles.push({tile,category});
+        this.defaultAvailableTiles.push({tile,category});
     }
 
     static draw(ctx){
+        const filteredTiles=this.availableTiles.filter(tile=>{
+        if(tile.category.includes(this.input.value)) return tile;
+        });
+        // if there's something in input 
+        if(this.input.value.length>0)this.availableTiles=filteredTiles;
+        else this.availableTiles=this.defaultAvailableTiles;
+    
         //input
         this.input.style=`position:absolute;left:${(Canvas.width-430)}px;top:${(Canvas.height/2)}px;width:393px;height:30px;
         background-color:${this.themeColors.darkgray};border:1px solid ${this.themeColors.darkgray};text-align:center;color:white;`;
@@ -102,10 +111,9 @@ export default class WorldEditor{
     static displayGhostTile(ctx){
         //shows current selection of tile
         if(this.slots.lastSelectedTile){
-            const offset=40;
             ctx.save();
-            ctx.globalAlpha=0.4;
-            this.slots.lastSelectedTile.tile.texture.position=Vector.create(Mouse.position.x+offset,Mouse.position.y+offset/2);
+            ctx.globalAlpha=0.5;
+            this.slots.lastSelectedTile.tile.texture.position=Vector.create(Mouse.position.x,Mouse.position.y);
             this.slots.lastSelectedTile.tile.texture.draw(ctx);
             ctx.restore();
         }
@@ -146,7 +154,6 @@ const grass=new SpriteSheet("../Game/assets/grassdirt.png");
 const inv=new SpriteSheet("../Game/assets/inventory.png");
 const t=new Tile("Grass",grass);
 const t2=new Tile("inv",inv);
-for(let i=0;i<25;i++)
+
 WorldEditor.addTiles(t,"grass");
-for(let i=0;i<25;i++)
 WorldEditor.addTiles(t2,"inventory");
