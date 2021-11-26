@@ -2,158 +2,183 @@ const Vector=Matter.Vector;
 import {Tile} from "../Game/scripts/Objects.js";
 import SpriteSheet from "../Game/scripts/SpritesheetHandler.js";
 import Canvas, { Mouse } from "../Game/scripts/Canvas.js";
+import Renderer from "../Game/scripts/Renderer.js";
 
-export default class WorldEditor{
-    
-    static availableTiles=[];
-    static defaultAvailableTiles=[];
-    static maxSlots=36;
-    static slots={
-        init:()=>{
-            for(let j=0;j<6;j++){
-                for(let i=0;i<6;i++){
-                    const position=Vector.create((Canvas.width-430)+25+60*i,(Canvas.height/2)+50+60*j);
-                    this.slots.positions.push(position);
-                }
-            }
-        },
-        positions:[],
-        lastSelectedTile:null ,
-    }
-    static currentPage=1;
-    static themeColors={
-        blue:"#7289da",
-        lightgray:"#99aab5",
-        gray:"#313639",
-        darkgray:"#2c2f33",
-        black:"#23272a"
-    }
-    static keybinds={
-        open:'F1',
-        changePageUp:'ArrowUp',
-        changePageDown:'ArrowDown',
-        
-    };
-    static opened=true;
-    static input=document.createElement('input');
-    /**
-     *  initializes spritesheets so textures can be used
-     * @param {*} sprite can pass single sprite or array of sprites  
-     * @param {*} category tag
-     */
-    static addTiles(tile,category){
-        this.availableTiles.push({tile,category});
-        this.defaultAvailableTiles.push({tile,category});
-    }
+export default class WorldEditor {
 
-    static draw(ctx){
-        const filteredTiles=this.availableTiles.filter(tile=>{
-        if(tile.category.includes(this.input.value)) return tile;
-        });
-        // if there's something in input 
-        if(this.input.value.length>0)this.availableTiles=filteredTiles;
-        else this.availableTiles=this.defaultAvailableTiles;
-    
-        //input
-        this.input.style=`position:absolute;left:${(Canvas.width-430)}px;top:${(Canvas.height/2)}px;width:393px;height:30px;
+  static availableTiles = [];
+  static defaultAvailableTiles = [];
+  static maxSlots = 36;
+  static slots = {
+    lastSelectedTileIndex: -1, //default to -1 since there's tile usually at 0th index position
+  }
+
+  static currentPage = 1;
+  static themeColors = {
+    blue: "#7289da",
+    lightgray: "#99aab5",
+    gray: "#313639",
+    darkgray: "#2c2f33",
+    black: "#23272a"
+  }
+  static keybinds = {
+    open: 'F1',
+    changePageUp: 'ArrowUp',
+    changePageDown: 'ArrowDown',
+  };
+  static opened = true;
+  static input = document.createElement('input');
+  /**
+   *  initializes spritesheets so textures can be used
+   * @param {*} sprite can pass single sprite or array of sprites  
+   * @param {*} category tag
+   */
+  static addTiles(tile, category) {
+    this.availableTiles.push({tile,category});
+    this.defaultAvailableTiles.push({tile,category});
+  }
+
+  static draw(ctx) {
+    const filteredTiles = this.availableTiles.filter(tile => {
+      if (tile.category.includes(this.input.value)) return tile;
+    });
+    // if there's something in input 
+    if (this.input.value.length > 0) this.availableTiles = filteredTiles;
+    else this.availableTiles = this.defaultAvailableTiles;
+    //input
+    this.input.style = `position:absolute;left:${(Canvas.width-430)}px;top:${(Canvas.height/2)}px;width:393px;height:30px;
         background-color:${this.themeColors.darkgray};border:1px solid ${this.themeColors.darkgray};text-align:center;color:white;`;
-        this.input.placeholder="Search for specific tile";
-        
-        ctx.save();
-        ctx.fillStyle=this.themeColors.black;
-        ctx.strokeStyle=this.themeColors.blue;
-        ctx.fillRect(Canvas.width-430,Canvas.height/2,400,420);      
-        ctx.fillStyle=this.themeColors.gray;    
-        //display slots
-            for(let i=0;i<this.slots.positions.length;i++){
-                const position=this.slots.positions[i];
-                ctx.fillRect(position.x,position.y,50,50);
-                //display border around slot to indicate which slot is about to be clicked
-                if(Mouse.checkBoxCollision(position,Vector.create(50,50)) ){
-                ctx.strokeRect(position.x,position.y,50,50);
-                }
-            }
+    this.input.placeholder = "Search for specific tile";
 
-        
-        let x=0,y=0;
-        //36 available visible slots,everything else hidden    
-        for(let i=0+(this.currentPage-1)*this.maxSlots;i<this.maxSlots*this.currentPage;i++){
-
-            const avTiles=this.availableTiles[i];
-            
-            if(x%6==0 && x!=0){x=0;y++;}
-            const position=Vector.create((Canvas.width-430)+50+60*x,(Canvas.height/2)+75+60*y);
-            const p=Vector.create(position.x-25,position.y-25);
-            if(Mouse.checkBoxCollision(p,Vector.create(50,50)) && Mouse.button.left ){
-                this.slots.lastSelectedTile=avTiles; // selects the tile
-                ctx.strokeStyle="red";
-                ctx.strokeRect(p.x,p.y,50,50);
-
-            }
-
-            x++;
-            if(avTiles!==undefined){
-            avTiles.tile.texture.position=position;
-            avTiles.tile.texture.draw(ctx);
-            }
+    ctx.save();
+    //background and slots
+    ctx.fillStyle = this.themeColors.black;
+    ctx.strokeStyle = this.themeColors.blue;
+    ctx.fillRect(Canvas.width - 430, Canvas.height / 2, 400, 420);
+    ctx.fillStyle = this.themeColors.gray;
+    //display slots
+    for (let j = 0; j < 6; j++) {
+      for (let i = 0; i < 6; i++) {
+        const position = Vector.create((Canvas.width - 430) + 25 + 60 * i, (Canvas.height / 2) + 50 + 60 * j);
+        ctx.fillRect(position.x, position.y, 50, 50);
+        //display border around slot to indicate which slot is about to be clicked
+        if (Mouse.checkBoxCollision(position, Vector.create(50, 50)) && Mouse.button.left) {
+          ctx.strokeStyle = "red";
+          ctx.strokeRect(position.x, position.y, 50, 50);
+          this.slots.lastSelectedTileIndex = i + j * 6;
         }
-        this.displayGhostTile(ctx);
-                //page count text
-                ctx.fillStyle='white';
-                ctx.font="14px Arial";
-                ctx.fillText(`Pages ${this.currentPage} / ${this.maxPageCount()}`,Canvas.width-110,(Canvas.height/2)+50);
-        
-        ctx.restore();
+      }
     }
-    /**
-     * shows currently "equipped" tile for editing
-     */
-    static displayGhostTile(ctx){
-        //shows current selection of tile
-        if(this.slots.lastSelectedTile){
-            ctx.save();
-            ctx.globalAlpha=0.5;
-            this.slots.lastSelectedTile.tile.texture.position=Vector.create(Mouse.position.x,Mouse.position.y);
-            this.slots.lastSelectedTile.tile.texture.draw(ctx);
-            ctx.restore();
-        }
+
+
+    //36 available visible slots,everything else hidden    
+    let x = 0,
+      y = 0;
+    for (let i = 0 + (this.currentPage - 1) * this.maxSlots; i < this.maxSlots * this.currentPage; i++) {
+
+      const avTiles = this.availableTiles[i];
+
+      if (x % 6 == 0 && x != 0) {
+        x = 0;
+        y++;
+      }
+      const position = Vector.create((Canvas.width - 430) + 50 + 60 * x, (Canvas.height / 2) + 75 + 60 * y);
+
+      x++;
+      if (avTiles !== undefined) {
+        avTiles.tile.texture.position = position;
+        avTiles.tile.texture.draw(ctx);
+      }
     }
-    static translateToGrid(position){
-        return Vector.create(Math.ceil(position.x/this.grid.size)*this.grid.size,Math.ceil(position.y/this.grid.size)*this.grid.size);
+    //shows currently selected tile
+    this.displayGhostTile(ctx);
+    
+    if(Mouse.button.left)this.placeTileToWorld();
+    if(Mouse.button.right)this.removeTileFromWorld();
+    //page count text
+    ctx.fillStyle = 'white';
+    ctx.font = "14px Arial";
+    ctx.fillText(`Pages ${this.currentPage} / ${this.maxPageCount()}`, Canvas.width - 110, (Canvas.height / 2) + 50);
+
+    ctx.restore();
+  }
+  /**
+   * shows currently "equipped" tile for editing
+   */
+  static displayGhostTile(ctx) {
+    //shows current selection of tile
+    if (this.slots.lastSelectedTileIndex >= 0) {
+      ctx.save();
+      ctx.globalAlpha = 0.4;
+      const currentTile = this.availableTiles[this.slots.lastSelectedTileIndex];
+      currentTile.tile.texture.position = Mouse.position;
+      currentTile.tile.texture.draw(ctx);
+      ctx.restore();
     }
-    static handleOpen(e){
-        if(e.key===this.keybinds.open) {
-            this.input.style="display:none";
-            this.opened=!this.opened;
-        }
+  }
+  /** position of said tile is needed,gridSize should be put in place depending on tile*/
+  static translateToGrid(position,gridSize) {
+    return Vector.create(Math.ceil(position.x / gridSize.x) * gridSize.x, Math.ceil(position.y / gridSize.y) * gridSize.y);
+  }
+  static handleOpen(e) {
+    if (e.key === this.keybinds.open) {
+      this.input.style = "display:none";
+      this.opened = !this.opened;
     }
-    static maxPageCount(){
-    return Math.ceil(this.availableTiles.length/this.maxSlots);
+  }
+  static maxPageCount() {
+    return Math.ceil(this.availableTiles.length / this.maxSlots);
+  }
+  static changeCurrentPage(e) {
+    if (e.key === this.keybinds.changePageUp && this.currentPage > 1) {
+      this.currentPage--;
+    } else if (e.key === this.keybinds.changePageDown && this.currentPage < this.maxPageCount()) {
+      this.currentPage++;
+    } else return;
+  }
+
+  //ADD,REMOVE FROM LAYER
+  static placeTileToWorld() {
+    //check if there's tile object in assigned tile 
+    if (this.slots.lastSelectedTileIndex >= 0) {
+      const copy = this.availableTiles[this.slots.lastSelectedTileIndex].tile;
+      const worldTile = new Tile(copy.label, copy.texture, Mouse.position);
+      worldTile.position = this.translateToGrid(Mouse.position,worldTile.size);
+      if (worldTile) {
+        Renderer.addToLayer(worldTile, worldTile.desiredLayer);
+      }
+    } else return;
+  }
+  static removeTileFromWorld(){
+    let desiredLayerName=null;
+    if(this.availableTiles[this.slots.lastSelectedTileIndex].tile) {
+    desiredLayerName=this.availableTiles[this.slots.lastSelectedTileIndex].tile.desiredLayer;
     }
-    static changeCurrentPage(e){
-        if(e.key===this.keybinds.changePageUp && this.currentPage>1){
-            this.currentPage--;
-        }else if(e.key===this.keybinds.changePageDown && this.currentPage<this.maxPageCount()){
-            this.currentPage++;
-        }else return;
+    if(desiredLayerName){
+    for(let i=Renderer.getLayer(desiredLayerName).length;i>0;i--){
+          const tileToCheck=Renderer.getLayer(desiredLayerName)[i];
+          if(tileToCheck!==undefined && Mouse.checkBoxCollision(tileToCheck.position,tileToCheck.size)) Renderer.removeFromLayer(tileToCheck,tileToCheck.desiredLayer);
     }
-   
+  }else return;
+}
+
 }
 document.body.append(WorldEditor.input);
-//
-setTimeout(()=>{WorldEditor.slots.init();},100);
 
-document.addEventListener('keydown',(e)=>{WorldEditor.handleOpen(e);WorldEditor.changeCurrentPage(e); });
+document.addEventListener('keydown', (e) => {
+  WorldEditor.handleOpen(e);
+  WorldEditor.changeCurrentPage(e);
+});
 
 
 
 
 
 //debug only
-const grass=new SpriteSheet("../Game/assets/grassdirt.png");
-const inv=new SpriteSheet("../Game/assets/inventory.png");
-const t=new Tile("Grass",grass);
-const t2=new Tile("inv",inv);
+const grass = new SpriteSheet("../Game/assets/grassdirt.png");
+const inv = new SpriteSheet("../Game/assets/inventory.png");
+const t = new Tile("Grass", grass);
+const t2 = new Tile("inv", inv);
 
-WorldEditor.addTiles(t,"grass");
-WorldEditor.addTiles(t2,"inventory");
+WorldEditor.addTiles(t, "grass");
+WorldEditor.addTiles(t2, "inventory");
