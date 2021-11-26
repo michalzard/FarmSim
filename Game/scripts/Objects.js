@@ -5,10 +5,13 @@ export class Tile{
     constructor(label,texture,position){
         this.size=Vector.create(40,40);
         this.texture=texture;
-        this.texture.position= position || this.texture.position;
+        this.position=position || Vector.create(0,0);
+        this.texture.position= this.position;
         this.label=label;
+        this.desiredLayer="background";
     }
     draw(ctx){
+        this.texture.position=this.position;
         if(this.texture)this.texture.draw(ctx);
     }
 }
