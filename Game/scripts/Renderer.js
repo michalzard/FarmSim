@@ -4,8 +4,6 @@ window.onload=Canvas.init();//inits canvas after whole page loads
 const ctx=Canvas.ctx;
 
 
-
-/** temporary solution */
 export default class Renderer{
     static layers={
         background:[],
@@ -50,17 +48,25 @@ export default class Renderer{
         }}
         window.requestAnimationFrame(Renderer.render);
     }
+    static getLayer(layerName){
+        const layers=Object.entries(Renderer.layers)
+        for(let i=0;i<layers.length;i++){
+        if(layers[i].includes(layerName.toLowerCase())){
+        const foundLayer=layers[i];
+        if(foundLayer) return foundLayer[1];
+    }
+    }}
     static addToLayer(entity,layerName){
-    const layers=Object.entries(Renderer.layers)
-    for(let i=0;i<layers.length;i++){
-    if(layers[i].includes(layerName.toLowerCase())){
-    const foundLayer=layers[i];
-    const layerArray=foundLayer[1];
-    if(layerArray)layerArray.push(entity);
+    const layer=this.getLayer(layerName);
+    if(layer)layer.push(entity);
     }
-    }
+
+    static removeFromLayer(entity,layerName){
+        const layer=this.getLayer(layerName);
+        //lookup entity,if found remove
+        const foundEntity=layer.indexOf(entity);
+        if(foundEntity>=0)layer.splice(foundEntity,1);
     }
 }
-console.log(Renderer.layers);
 //added ui elements
 Renderer.addToLayer(WorldEditor,'ui')
