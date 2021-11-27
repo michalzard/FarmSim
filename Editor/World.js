@@ -143,8 +143,16 @@ export default class WorldEditor {
     const copy = this.availableTiles[this.slots.lastSelectedTileIndex].tile;
     const worldTile = new Tile(copy.label, copy.texture, Mouse.position);
     worldTile.position = this.translateToGrid(Mouse.position,worldTile.size);
-    if(worldTile && Mouse.button.left)Renderer.addToLayer(worldTile, worldTile.desiredLayer); 
-    } else return;
+    let desiredLayerName=null;
+    if(this.availableTiles[this.slots.lastSelectedTileIndex].tile) {
+    desiredLayerName=this.availableTiles[this.slots.lastSelectedTileIndex].tile.desiredLayer;
+    }
+    if(desiredLayerName){
+    for(let i=Renderer.getLayer(desiredLayerName).length;i>0;i--){
+          const tileToCheck=Renderer.getLayer(desiredLayerName)[i];
+    if(worldTile && Mouse.button.left && Mouse.checkBoxCollision(tileToCheck.position,tileToCheck.size))Renderer.addToLayer(worldTile, worldTile.desiredLayer); 
+    }}} 
+    else return;
   }
   static removeTileFromWorld(){
     let desiredLayerName=null;
