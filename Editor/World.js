@@ -93,7 +93,6 @@ export default class WorldEditor {
     //shows currently selected tile
     this.displayGhostTile(ctx);
     
-    if(Mouse.button.left)this.placeTileToWorld();
     if(Mouse.button.right)this.removeTileFromWorld();
     //page count text
     ctx.fillStyle = 'white';
@@ -141,12 +140,10 @@ export default class WorldEditor {
   static placeTileToWorld() {
     //check if there's tile object in assigned tile 
     if (this.slots.lastSelectedTileIndex >= 0) {
-      const copy = this.availableTiles[this.slots.lastSelectedTileIndex].tile;
-      const worldTile = new Tile(copy.label, copy.texture, Mouse.position);
-      worldTile.position = this.translateToGrid(Mouse.position,worldTile.size);
-      if (worldTile) {
-        Renderer.addToLayer(worldTile, worldTile.desiredLayer);
-      }
+    const copy = this.availableTiles[this.slots.lastSelectedTileIndex].tile;
+    const worldTile = new Tile(copy.label, copy.texture, Mouse.position);
+    worldTile.position = this.translateToGrid(Mouse.position,worldTile.size);
+    if(worldTile && Mouse.button.left)Renderer.addToLayer(worldTile, worldTile.desiredLayer); 
     } else return;
   }
   static removeTileFromWorld(){
@@ -170,8 +167,10 @@ document.addEventListener('keydown', (e) => {
   WorldEditor.changeCurrentPage(e);
 });
 
-
-
+/**
+ * TODO: FIGURE OUT HOW TO NOT DUPLICATE TILES WHEN YOU PLACE THEM
+ * WorldEditor.placeTileToWolrd
+ */
 
 
 //debug only
