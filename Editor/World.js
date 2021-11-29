@@ -12,7 +12,7 @@ export default class WorldEditor {
   static slots = {
     lastSelectedTileIndex: -1, //default to -1 since there's tile usually at 0th index position
   }
-
+  static isLastTileUnderMouse=false;
   static currentPage = 1;
   static themeColors = {
     blue: "#7289da",
@@ -53,7 +53,6 @@ export default class WorldEditor {
     ctx.save();
     //background and slots
     ctx.fillStyle = this.themeColors.black;
-    ctx.strokeStyle = this.themeColors.blue;
     ctx.fillRect(Canvas.width - 430, Canvas.height / 2, 400, 420);
     ctx.fillStyle = this.themeColors.gray;
     //display slots
@@ -92,7 +91,11 @@ export default class WorldEditor {
     }
     //shows currently selected tile
     this.displayGhostTile(ctx);
-    
+    //add 
+    //that mouse box check is so that you dont create tile when inside of editor window because it places tile behind editor into world
+    //if tile needed in that area just move your camera so that it isnt overlaping with window
+    if(Mouse.button.left && !Mouse.checkBoxCollision(Vector.create(Canvas.width-430,Canvas.height/2),Vector.create(400,420)))this.addTileToWorld();
+    //remove
     if(Mouse.button.right)this.removeTileFromWorld();
     //page count text
     ctx.fillStyle = 'white';
@@ -110,14 +113,16 @@ export default class WorldEditor {
       ctx.save();
       ctx.globalAlpha = 0.4;
       const currentTile = this.availableTiles[this.slots.lastSelectedTileIndex];
+      if(currentTile){
       currentTile.tile.texture.position = Mouse.position;
       currentTile.tile.texture.draw(ctx);
+      }
       ctx.restore();
     }
   }
   /** position of said tile is needed,gridSize should be put in place depending on tile*/
   static translateToGrid(position,gridSize) {
-    return Vector.create(Math.ceil(position.x / gridSize.x) * gridSize.x, Math.ceil(position.y / gridSize.y) * gridSize.y);
+    return Vector.create(Math.round(position.x / gridSize.x) * gridSize.x, Math.round(position.y / gridSize.y) * gridSize.y);
   }
   static handleOpen(e) {
     if (e.key === this.keybinds.open) {
@@ -137,9 +142,9 @@ export default class WorldEditor {
   }
 
   //ADD,REMOVE FROM LAYER
-  static placeTileToWorld() {
+  static addTileToWorld() {
     //check if there's tile object in assigned tile 
-    if (this.slots.lastSelectedTileIndex >= 0) {
+    if (this.slots.lastSelectedTileIndex >= 0 && this.availableTiles[this.slots.lastSelectedTileIndex]!==undefined) {
     const copy = this.availableTiles[this.slots.lastSelectedTileIndex].tile;
     const worldTile = new Tile(copy.label, copy.texture, Mouse.position);
     worldTile.position = this.translateToGrid(Mouse.position,worldTile.size);
@@ -147,11 +152,16 @@ export default class WorldEditor {
     if(this.availableTiles[this.slots.lastSelectedTileIndex].tile) {
     desiredLayerName=this.availableTiles[this.slots.lastSelectedTileIndex].tile.desiredLayer;
     }
-    if(desiredLayerName){
-    for(let i=Renderer.getLayer(desiredLayerName).length;i>0;i--){
-          const tileToCheck=Renderer.getLayer(desiredLayerName)[i];
-    if(worldTile && Mouse.button.left && Mouse.checkBoxCollision(tileToCheck.position,tileToCheck.size))Renderer.addToLayer(worldTile, worldTile.desiredLayer); 
-    }}} 
+    
+    for(let i=0;i<Renderer.getLayer(desiredLayerName).length;i++){
+    const toCheck=Renderer.getLayer(desiredLayerName)[i];
+    const offsettedPosition=Vector.create(toCheck.position.x-toCheck.size.x/2,toCheck.position.y-toCheck.size.y/2);
+    this.isLastTileUnderMouse=Mouse.checkBoxCollision(offsettedPosition,toCheck.size);
+  }
+    if(worldTile && !this.isLastTileUnderMouse){
+    Renderer.addToLayer(worldTile, worldTile.desiredLayer); 
+  }
+    }
     else return;
   }
   static removeTileFromWorld(){
@@ -160,9 +170,10 @@ export default class WorldEditor {
     desiredLayerName=this.availableTiles[this.slots.lastSelectedTileIndex].tile.desiredLayer;
     }
     if(desiredLayerName){
-    for(let i=Renderer.getLayer(desiredLayerName).length;i>0;i--){
-          const tileToCheck=Renderer.getLayer(desiredLayerName)[i];
-          if(tileToCheck!==undefined && Mouse.checkBoxCollision(tileToCheck.position,tileToCheck.size)) Renderer.removeFromLayer(tileToCheck,tileToCheck.desiredLayer);
+      for(let i=0;i<Renderer.getLayer(desiredLayerName).length;i++){
+        const tileToCheck=Renderer.getLayer(desiredLayerName)[i];
+        const offsettedPosition=Vector.create(tileToCheck.position.x-tileToCheck.size.x/2,tileToCheck.position.y-tileToCheck.size.y/2); 
+          if(tileToCheck!==undefined && Mouse.checkBoxCollision(offsettedPosition,tileToCheck.size)) Renderer.removeFromLayer(tileToCheck,tileToCheck.desiredLayer);
     }
   }else return;
 }
@@ -174,6 +185,7 @@ document.addEventListener('keydown', (e) => {
   WorldEditor.handleOpen(e);
   WorldEditor.changeCurrentPage(e);
 });
+
 
 /**
  * TODO: FIGURE OUT HOW TO NOT DUPLICATE TILES WHEN YOU PLACE THEM
