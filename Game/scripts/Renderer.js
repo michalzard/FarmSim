@@ -49,9 +49,10 @@ export default class Renderer{
         window.requestAnimationFrame(Renderer.render);
     }
     static getLayer(layerName){
+        
         const layers=Object.entries(Renderer.layers)
         for(let i=0;i<layers.length;i++){
-        if(layers[i].includes(layerName.toLowerCase())){
+        if(typeof layerName === "string" && layers[i].includes(layerName.toLowerCase())){
         const foundLayer=layers[i];
         if(foundLayer) return foundLayer[1];
     }
