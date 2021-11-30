@@ -11,8 +11,7 @@ export default class WorldEditor {
   static maxSlots = 36;
   static slots = {
     lastSelectedTileIndex: -1, //default to -1 since there's tile usually at 0th index position
-  }
-  static isLastTileUnderMouse=false;
+  };
   static currentPage = 1;
   static themeColors = {
     blue: "#7289da",
@@ -20,12 +19,50 @@ export default class WorldEditor {
     gray: "#313639",
     darkgray: "#2c2f33",
     black: "#23272a"
-  }
+  };
   static keybinds = {
     open: 'F1',
     changePageUp: 'ArrowUp',
     changePageDown: 'ArrowDown',
+    undo : 'z',
+    redo: 'y',
   };
+  
+  static history = {
+    actions:[],
+    lastAction:null,
+    actionLimit:30,
+    addAction:(type,tile)=>{
+    //TODO : Debug this shit cuz its bugging adding and removing somehow
+    if(this.history.actions.length<this.history.actionLimit) this.history.actions.push({type,tile});
+    else {this.history.actions.shift();this.history.actions.push({type,tile});}
+  
+    },
+    undo:(e)=>{
+      // CTRL + Z
+      if(e.ctrlKey && e.key===this.keybinds.undo){
+      //undoes last action,returns tile back to world,gets rid of recorder action from array
+      for(let i=0;i<this.history.actions.length;i++){
+        const actions=this.history.actions[i]
+        console.log(actions)
+        if(actions.type==='remove') {
+        const lastRemovedTile=this.history.actions[i].tile
+        if(lastRemovedTile) Renderer.addToLayer(lastRemovedTile,lastRemovedTile.desiredLayer);}
+        else return;
+      
+      }
+      console.log(this.history.actions);
+
+      }
+    },
+    redo:(e)=>{
+      // CTRL + Y
+      if(e.ctrlKey &&  e.key===this.keybinds.redo){
+      
+      }
+    },
+  };
+
   static opened = true;
   static input = document.createElement('input');
   /**
@@ -91,9 +128,10 @@ export default class WorldEditor {
     }
     //shows currently selected tile
     this.displayGhostTile(ctx);
-    //add 
+    
     //that mouse box check is so that you dont create tile when inside of editor window because it places tile behind editor into world
     //if tile needed in that area just move your camera so that it isnt overlaping with window
+    //add
     if(Mouse.button.left && !Mouse.checkBoxCollision(Vector.create(Canvas.width-430,Canvas.height/2),Vector.create(400,420)))this.addTileToWorld();
     //remove
     if(Mouse.button.right)this.removeTileFromWorld();
@@ -149,31 +187,36 @@ export default class WorldEditor {
     const worldTile = new Tile(copy.label, copy.texture, Mouse.position);
     worldTile.position = this.translateToGrid(Mouse.position,worldTile.size);
     let desiredLayerName=null;
+    let isLastTileUnderMouse=false;
     if(this.availableTiles[this.slots.lastSelectedTileIndex].tile) {
     desiredLayerName=this.availableTiles[this.slots.lastSelectedTileIndex].tile.desiredLayer;
     }
-    
     for(let i=0;i<Renderer.getLayer(desiredLayerName).length;i++){
     const toCheck=Renderer.getLayer(desiredLayerName)[i];
     const offsettedPosition=Vector.create(toCheck.position.x-toCheck.size.x/2,toCheck.position.y-toCheck.size.y/2);
-    this.isLastTileUnderMouse=Mouse.checkBoxCollision(offsettedPosition,toCheck.size);
-  }
-    if(worldTile && !this.isLastTileUnderMouse){
+    isLastTileUnderMouse=Mouse.checkBoxCollision(offsettedPosition,toCheck.size);  
+    }
+    
+    if(worldTile && !isLastTileUnderMouse){
     Renderer.addToLayer(worldTile, worldTile.desiredLayer); 
-  }
+    this.history.addAction('add',worldTile);
+    }
     }
     else return;
   }
   static removeTileFromWorld(){
     let desiredLayerName=null;
-    if(this.availableTiles[this.slots.lastSelectedTileIndex].tile) {
+    if(this.availableTiles[this.slots.lastSelectedTileIndex]!==undefined) {
     desiredLayerName=this.availableTiles[this.slots.lastSelectedTileIndex].tile.desiredLayer;
     }
     if(desiredLayerName){
       for(let i=0;i<Renderer.getLayer(desiredLayerName).length;i++){
         const tileToCheck=Renderer.getLayer(desiredLayerName)[i];
         const offsettedPosition=Vector.create(tileToCheck.position.x-tileToCheck.size.x/2,tileToCheck.position.y-tileToCheck.size.y/2); 
-          if(tileToCheck!==undefined && Mouse.checkBoxCollision(offsettedPosition,tileToCheck.size)) Renderer.removeFromLayer(tileToCheck,tileToCheck.desiredLayer);
+          if(tileToCheck!==undefined && Mouse.checkBoxCollision(offsettedPosition,tileToCheck.size)) {
+            Renderer.removeFromLayer(tileToCheck,tileToCheck.desiredLayer);
+            this.history.addAction('remove',tileToCheck);
+          }
     }
   }else return;
 }
@@ -184,8 +227,9 @@ document.body.append(WorldEditor.input);
 document.addEventListener('keydown', (e) => {
   WorldEditor.handleOpen(e);
   WorldEditor.changeCurrentPage(e);
+  WorldEditor.history.undo(e);
+  WorldEditor.history.redo(e);
 });
-
 
 /**
  * TODO: FIGURE OUT HOW TO NOT DUPLICATE TILES WHEN YOU PLACE THEM
