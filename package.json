@@ -4,7 +4,9 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ./Launcher/window.js"
+    "start": "electron ./Launcher/window.js",
+    "server": "node ./Launcher/server/index.js",
+    "server-dev": "nodemon ./Launcher/server/index.js"
   },
   "repository": {
     "type": "git",
@@ -19,6 +21,11 @@
   "homepage": "https://github.com/michalzard/FarmSim#readme",
   "devDependencies": {
     "dotenv": "^10.0.0",
-    "electron": "^15.3.0"
+    "electron": "^15.3.0",
+    "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^6.0.14"
   }
 }
