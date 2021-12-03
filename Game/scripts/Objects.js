@@ -16,8 +16,8 @@ export class Tile{
     }
 }
 export class TilePattern extends Tile{
-    constructor(size,tileCutOutSize){
-        super(this.label,this.texture,this.position);
+    constructor(label,texture,position,size,tileCutOutSize){
+        super(label,texture,position);
         this.size=size || Vector.create(100,100);
         this.patternCutoutSize=tileCutOutSize || Vector.create(16,16);
         this.patternDirection="repeat";
