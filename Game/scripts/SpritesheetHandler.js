@@ -15,6 +15,8 @@ export default class SpriteSheet{
     this.angle=0;
     this.startingFrame=0;//offset to start on specific frame
     this.currentFrame=this.startingFrame;//currently displayed frame
+    //
+    this.scale=Vector.create(1,1);
     //cols,rows
     this.frameColumns=1;
     this.frameRows=1;
@@ -32,6 +34,7 @@ export default class SpriteSheet{
     ctx.translate(this.position.x ,this.position.y);
     //rotate 
     ctx.rotate(this.angle);
+    ctx.scale(this.scale.x,this.scale.y);
     //draw rect offset by half its size
     ctx.drawImage(this.img,col * this.frameSize.x+this.frameOffset.x,
     row * this.frameSize.y + this.frameOffset.y,
@@ -61,3 +64,9 @@ export default class SpriteSheet{
 }
 
 
+
+export const Textures={
+    'grass' : new SpriteSheet("../Game/assets/grassdirt.png") ,
+    'inv' : new SpriteSheet("../Game/assets/inventory.png") ,
+    
+}
