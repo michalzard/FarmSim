@@ -1,9 +1,14 @@
 const Vector=Matter.Vector;
 import {Tile, TilePattern} from "../Game/scripts/Objects.js";
-import SpriteSheet from "../Game/scripts/SpritesheetHandler.js";
+import SpriteSheet,{Textures} from "../Game/scripts/SpritesheetHandler.js";
 import Canvas, { Mouse } from "../Game/scripts/Canvas.js";
 import Renderer from "../Game/scripts/Renderer.js";
 
+//debug only
+
+const t = new Tile("grass", Textures.grass);
+const t2 = new Tile("inv", Textures.inv);
+//
 
 export default class WorldEditor {
 
@@ -105,7 +110,7 @@ export default class WorldEditor {
       },
     }
   }
-  static opened = true;
+  static opened = false;
   static input = document.createElement('input');
   /**
    *  initializes spritesheets so textures can be used
@@ -291,11 +296,11 @@ static draw(ctx) {
       const ommitedArray=layerArray.map(el=>{const {position,label}=el;return {label,position};});
       jsonData.push({layer:layerName,data:ommitedArray});
     }
-    const headers = {
+  const headers = {
       "Content-Type": "application/json",                                                                                                
       "Access-Control-Origin": "*"
    }
-    fetch("http:localhost:3000/", {
+    fetch("http:localhost:3000/map", {
     method: "POST",
     headers:headers,
     body:  JSON.stringify(jsonData),
@@ -304,6 +309,24 @@ static draw(ctx) {
   }
   static loadWorld(worldName){
 
+    fetch(`http:localhost:3000/map?name=${worldName}`).then(data=>data.json()).then(data=>{
+      const {message,mapData} = data;
+      console.log(message);
+      const worldData=JSON.parse(mapData);
+      for(let i=0;i<worldData.length;i++){
+        const map=worldData[i];
+        for(let j=0;j<map.data.length;j++){
+          const mData=map.data[j];//tiles and other objects
+
+       
+          //using to lowercase so that it can correctly lookup needed texture
+          const tile=new Tile(mData.label,Textures[mData.label.toLowerCase()],mData.position);
+          Renderer.addToLayer(tile,map.layer);
+        
+
+        }
+      }
+    });
   }
   
 }
@@ -324,12 +347,8 @@ document.addEventListener('keydown', (e) => {
  */
 
 
-//debug only
-const grass = new SpriteSheet("../Game/assets/grassdirt.png");
-const inv = new SpriteSheet("../Game/assets/inventory.png");
-const t = new Tile("Grass", grass);
-const t2 = new Tile("inv", inv);
 
 WorldEditor.addTileTypes(t, "grass");
 WorldEditor.addTileTypes(t2, "inventory");
 
+WorldEditor.loadWorld('testing');
