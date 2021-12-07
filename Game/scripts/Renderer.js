@@ -1,5 +1,6 @@
 import WorldEditor from "../../Editor/World.js";
 import Canvas from "./Canvas.js";
+import { PlayerInvetoryUI } from "./UserInterFace.js";
 window.onload=Canvas.init();//inits canvas after whole page loads
 const ctx=Canvas.ctx;
 
@@ -15,6 +16,7 @@ export default class Renderer{
     };
     static render(){
         ctx.clearRect(0,0,Canvas.width,Canvas.height);
+        ctx.imageSmoothingEnabled=false; // Disabled antialiasing
         if(Renderer.layers.background.length>0){
         for(let i=0;i<Renderer.layers.background.length;i++){
             const objectLayer=Renderer.layers.background;
@@ -71,3 +73,6 @@ export default class Renderer{
 }
 //added ui elements
 Renderer.addToLayer(WorldEditor,'ui')
+Renderer.addToLayer(PlayerInvetoryUI,'ui');
+
+console.log(Renderer.layers.ui)
