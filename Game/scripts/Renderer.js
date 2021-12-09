@@ -1,9 +1,8 @@
-import WorldEditor from "../../Editor/World.js";
+import {worldEdit as WorldEditor} from "../../Editor/World.js";
 import Canvas from "./Canvas.js";
-import { PlayerInvetoryUI } from "./UserInterFace.js";
+import { playerUI as PlayerInvetoryUI } from "./UserInterFace.js";
 window.onload=Canvas.init();//inits canvas after whole page loads
 const ctx=Canvas.ctx;
-
 
 export default class Renderer{
     static layers={
@@ -20,34 +19,48 @@ export default class Renderer{
         if(Renderer.layers.background.length>0){
         for(let i=0;i<Renderer.layers.background.length;i++){
             const objectLayer=Renderer.layers.background;
-            objectLayer[i].draw(ctx);
+            if(objectLayer[i].active)objectLayer[i].draw(ctx);
         }}
 
         if(Renderer.layers.foreground.length>0){
         for(let i=0;i<Renderer.layers.foreground.length;i++){
             const objectLayer=Renderer.layers.foreground;
-            objectLayer[i].draw(ctx);
+            if(objectLayer[i].active)objectLayer[i].draw(ctx);
         }}
         if(Renderer.layers.env.length>0){
         for(let i=0;i<Renderer.layers.env.length;i++){
             const objectLayer=Renderer.layers.env;
-            objectLayer[i].draw(ctx);
+            if(objectLayer[i].active)objectLayer[i].draw(ctx);
         }}
         if(Renderer.layers.buildings.length>0){
         for(let i=0;i<Renderer.layers.buildings.length;i++){
             const objectLayer=Renderer.layers.buildings;
-            objectLayer[i].draw(ctx);
+            if(objectLayer[i].active)objectLayer[i].draw(ctx);
         }}
         if(Renderer.layers.entities.length>0){
         for(let i=0;i<Renderer.layers.entities.length;i++){
             const objectLayer=Renderer.layers.entities;
-            objectLayer[i].draw(ctx);
+            if(objectLayer[i].active)objectLayer[i].draw(ctx);
         }}
         if(Renderer.layers.ui.length>0){
             for(let i=0;i<Renderer.layers.ui.length;i++){
                 const objectLayer=Renderer.layers.ui;
-                if(objectLayer[i].opened) objectLayer[i].draw(ctx);
+                if(objectLayer[i].active) objectLayer[i].draw(ctx); 
         }}
+        
+        // const layers=Object.entries(Renderer.layers);
+        // for(let i=0;i<layers.length;i++){
+        //     const layerName=layers[i][0];
+        //     for(let j=0;j<Renderer.getLayer(layerName).length;j++){
+        //         const layerArray=Renderer.getLayer(layers[i][j]);
+        //         if(layerArray) {
+        //             layerArray[j].draw(ctx);
+        //         console.log(layerArray)
+        //         }
+                
+        //     }
+        // }
+
         window.requestAnimationFrame(Renderer.render);
     }
     static getLayer(layerName){
@@ -72,7 +85,7 @@ export default class Renderer{
     }
 }
 //added ui elements
-Renderer.addToLayer(WorldEditor,'ui')
+Renderer.addToLayer(WorldEditor,'ui');
 Renderer.addToLayer(PlayerInvetoryUI,'ui');
 
-console.log(Renderer.layers.ui)
+console.log(Renderer.layers);
