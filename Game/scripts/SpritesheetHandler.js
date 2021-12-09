@@ -66,7 +66,7 @@ export default class SpriteSheet{
 
 
 export const Textures={
-    'grass' : new SpriteSheet("../Game/assets/grassdirt.png") ,
-    'inv' : new SpriteSheet("../Game/assets/inventory.png") ,
-    
+    grass : "../Game/assets/grassdirt.png",
+    inv : "../Game/assets/inventory.png",
+    invui : '../Game/assets/inventoryUI.png',
 }
