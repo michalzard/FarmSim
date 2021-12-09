@@ -1,16 +1,18 @@
 import {RectangleCollider} from "./PhysicsObjects.js";
-import Canvas from "./Canvas.js";
+import Canvas, { Mouse } from "./Canvas.js";
 import Renderer from "./Renderer.js";
 import SpriteSheet from "./SpritesheetHandler.js";
+import { Inventory,Item } from "./Inventory.js";
+import { GameObject } from "./GameObject.js";
 
 const ctx=Canvas.ctx;
 const Body=Matter.Body,
 Vector=Matter.Vector;
 
-export default class Player{
+export default class Player extends GameObject{
     
     constructor(world,position){
-        this.position=position || Vector.create(300,300);
+        super();
         this.size=Vector.create(40,60);
         this.input={
         up:false,
@@ -21,8 +23,10 @@ export default class Player{
         this.maxSpeed=5;
         this.collider=new RectangleCollider(world,this.position,this.size,false);
         //this.texture=new SpriteSheet("./assets/testsheet.jpg",this.size);
+        this.inventory=new Inventory(32)
+        for(let i=0;i<115;i++)
+        this.inventory.addItem(new Item(77))
         Body.setInertia(this.collider,Infinity);
-
         Renderer.addToLayer(this,"entities");
         //listeners
         window.addEventListener("keydown",(e)=>{this.handleKeyDown(e)});
@@ -36,6 +40,7 @@ export default class Player{
         this.texture.update(this.collider.body.position,this.collider.body.angle);
         this.texture.draw(ctx);
     }
+    
     }
  
     updatePosition(){

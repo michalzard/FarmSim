@@ -1,20 +1,24 @@
 const Vector=Matter.Vector;
 
+import { GameObject } from "./GameObject.js";
 
-export class Tile{
+
+export class Tile extends GameObject{
     constructor(label,texture,position){
-        this.size=Vector.create(40,40);
-        this.texture=texture;
-        this.position=position || Vector.create(0,0);
-        this.texture.position= this.position;
+        super();
         this.label=label;
-        this.desiredLayer="background";
+        this.texture=texture;
+        this.transform.position=position;
+        this.desiredLayer='background';
     }
     draw(ctx){
-        this.texture.position=this.position;
-        if(this.texture)this.texture.draw(ctx);
+        if(this.texture){
+            this.texture.position=this.transform.position;
+            this.texture.draw(ctx);
+        }
     }
 }
+//TODO:refactoris
 export class TilePattern extends Tile{
     constructor(label,texture,position,size,tileCutOutSize){
         super(label,texture,position);
@@ -25,7 +29,7 @@ export class TilePattern extends Tile{
     draw(ctx){
         ctx.save();
         ctx.fillStyle=ctx.createPattern(this.textureFromCanvas(this.texture,this.patternCutoutSize),this.patternDirection);
-        ctx.rect(this.position.x,this.position.y,this.size.x,this.size.y);
+        ctx.rect(this.transform.position.x,this.transform.position.y,this.size.x,this.size.y);
         ctx.fill();
         ctx.restore();
     }
