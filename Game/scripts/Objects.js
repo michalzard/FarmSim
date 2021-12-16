@@ -5,15 +5,14 @@ import { GameObject } from "./GameObject.js";
 
 export class Tile extends GameObject{
     constructor(label,texture,position){
-        super();
-        this.label=label;
+        super(label);
         this.texture=texture;
         this.transform.position=position;
         this.desiredLayer='background';
     }
     draw(ctx){
         if(this.texture){
-            this.texture.position=this.transform.position;
+            this.texture.transform.position=this.transform.position;
             this.texture.draw(ctx);
         }
     }
