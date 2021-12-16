@@ -27,6 +27,19 @@ export class GameObject{
     }
     return results;
     }
+
     setActive(bool){this.active=bool;}
 
+    updatePositionWithParent(position,offset){
+    if(this.parent!==null && this.parent instanceof GameObject){
+    if(offset){
+    const posWoffset=Vector.create(position.x+offset.x,position.y+offset.y);
+    this.parent.transform.position=posWoffset;
+    this.transform.position=posWoffset;
+    }else{
+    this.parent.transform.position=position;
+    this.transform.position=position;
+    }}
+    }
+    
 }
