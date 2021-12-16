@@ -1,8 +1,8 @@
 const Vector=Matter.Vector;
+import Renderer from "../Game/scripts/Renderer.js";
 import {Tile, TilePattern} from "../Game/scripts/Objects.js";
 import SpriteSheet, {Textures} from "../Game/scripts/SpritesheetHandler.js";
 import Canvas, { Mouse } from "../Game/scripts/Canvas.js";
-import Renderer from "../Game/scripts/Renderer.js";
 import { GameObject } from "../Game/scripts/GameObject.js";
 
 //debug only
@@ -101,7 +101,7 @@ class WorldEditor extends GameObject{
       ctx.globalAlpha = 0.4;
       const currentTile = this.availableTiles[this.slots.lastSelectedTileIndex];
       if(currentTile){
-      currentTile.tile.texture.position = Mouse.position;
+      currentTile.tile.texture.transform.position = Mouse.position;
       currentTile.tile.texture.draw(ctx);
       }
       ctx.restore();
@@ -134,7 +134,7 @@ class WorldEditor extends GameObject{
     if (this.slots.lastSelectedTileIndex >= 0 && this.availableTiles[this.slots.lastSelectedTileIndex]!==undefined) {
     const copy = this.availableTiles[this.slots.lastSelectedTileIndex].tile;
     const worldTile = new Tile(copy.label, copy.texture, Mouse.position);
-    worldTile.transform.position= this.translateToGrid(Mouse.position,worldTile.transform.size);
+    worldTile.transform.position = this.translateToGrid(Mouse.position,worldTile.transform.size);
 
     let desiredLayerName=null;
     let isLastTileUnderMouse=false;
@@ -163,8 +163,8 @@ class WorldEditor extends GameObject{
     if(desiredLayerName){
       for(let i=0;i<Renderer.getLayer(desiredLayerName).length;i++){
         const tileToCheck=Renderer.getLayer(desiredLayerName)[i];
-        const offsettedPosition=Vector.create(tileToCheck.position.x-tileToCheck.size.x/2,tileToCheck.position.y-tileToCheck.size.y/2); 
-          if(tileToCheck!==undefined && Mouse.checkBoxCollision(offsettedPosition,tileToCheck.size)) {
+        const offsettedPosition=Vector.create(tileToCheck.transform.position.x-tileToCheck.transform.size.x/2,tileToCheck.transform.position.y-tileToCheck.transform.size.y/2); 
+          if(tileToCheck!==undefined && Mouse.checkBoxCollision(offsettedPosition,tileToCheck.transform.size)) {
             Renderer.removeFromLayer(tileToCheck,tileToCheck.desiredLayer);
             this.history.addAction('remove',tileToCheck);
           }
@@ -217,7 +217,7 @@ draw(ctx) {
 
     x++;
     if (avTiles !== undefined) {
-      avTiles.tile.texture.position = position;
+      avTiles.tile.texture.transform.position = position;
       avTiles.tile.texture.draw(ctx);
     }
   }
@@ -247,7 +247,6 @@ draw(ctx) {
 
   saveWorld(e){
     if(e.ctrlKey && e.key==="s"){
-    console.log('World Saved')
     const allLayers=Object.entries(Renderer.layers).filter(el=>{
      return el[0]!=='entities' && el[0]!=='ui'
     });
@@ -256,38 +255,28 @@ draw(ctx) {
       const layerName=allLayers[i][0];
       const layerArray=allLayers[i][1];
       //filtered out texture object containing animation info which is not needed when saving info about world
-      const ommitedArray=layerArray.map(el=>{const {position,label}=el;return {label,position};});
+      const ommitedArray=layerArray.map(el=>{const {transform,label}=el;return {label,transform};});
       jsonData.push({layer:layerName,data:ommitedArray});
     }
-  const headers = {
-      "Content-Type": "application/json",                                                                                                
-      "Access-Control-Origin": "*"
-   }
-    fetch("http:localhost:3000/map", {
-    method: "POST",
-    headers:headers,
-    body:  JSON.stringify(jsonData),
-  })
+    const mapName='map_name';
+    localStorage.setItem(mapName,JSON.stringify(jsonData)); 
+    console.log(`${mapName} World Saved`)
   }
   }
   loadWorld(worldName){
-
-    fetch(`http:localhost:3000/map?name=${worldName}`).then(data=>data.json()).then(data=>{
-      const {message,mapData} = data;
-      console.log(message);
-      const worldData=JSON.parse(mapData);
+    const mapData=localStorage.getItem(worldName);
+    const worldData=JSON.parse(mapData);
       for(let i=0;i<worldData.length;i++){
         const map=worldData[i];
         for(let j=0;j<map.data.length;j++){
           const mData=map.data[j];//tiles and other objects
-
           //using to lowercase so that it can correctly lookup needed texture
           const texture=new SpriteSheet(Textures[mData.label.toLowerCase()]);
-          const tile=new Tile(mData.label,texture,mData.position);
+          const tile=new Tile(mData.label,texture,mData.transform.position);
           Renderer.addToLayer(tile,map.layer);
         }
       }
-    });
+
   }
   
 }
@@ -310,7 +299,9 @@ document.addEventListener('keydown', (e) => {
  * TODO: Rectangle tool that will select area and place pattern in that size
  */
 
- worldEdit.addTileTypes(t, "grass");
- worldEdit.addTileTypes(t2, "inventory");
+worldEdit.addTileTypes(t, "grass");
+worldEdit.addTileTypes(t2, "inventory");
 
- worldEdit.loadWorld('testing');
+setTimeout(()=>{
+  worldEdit.loadWorld('map_name');
+},10);
