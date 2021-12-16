@@ -4,7 +4,9 @@ export class Inventory {
   constructor(slotAmount) {
     this.items = [];
     this.maxSlots = slotAmount || 20;
-
+    this.currency={
+      gold:0,
+    };
   }
   addItem(item) {
     if (this.items.length < this.maxSlots && item instanceof Item) {
@@ -47,7 +49,10 @@ export class Item {
     this.id = id || 0;
     this.rarity = 'legendary';
     this.quantity = 1;
-    this.quantityMax = 5;
+    this.quantityMax = 10;
     this.desiredLayer = 'env';
+    this.currency={
+      gold:0,
+    };
   }
 }
