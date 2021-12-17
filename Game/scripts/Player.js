@@ -21,7 +21,8 @@ export default class Player extends GameObject{
         }
         this.maxSpeed=5;
         this.transform.size=new Vector.create(50,70)
-        this.collider=new RectangleCollider(world,position,this.transform.size,false);
+        this.initPosition=position;
+        this.collider=new RectangleCollider(world,this.initPosition,this.transform.size,false);
         //this.texture=new SpriteSheet("./assets/testsheet.jpg",this.size);
         this.inventory=new Inventory(32)
         for(let i=0;i<115;i++)
