@@ -1,4 +1,4 @@
-import SpriteSheet, { Textures } from "./SpritesheetHandler.js";
+import SpriteSheet, { TEXTURE_DATA } from "./SpritesheetHandler.js";
 
 export class Inventory {
   constructor(slotAmount) {
@@ -45,7 +45,7 @@ export class Inventory {
 export class Item {
   constructor(id) {
     this.label = "Testing Item";
-    this.texture = new SpriteSheet(Textures.grass);
+    this.texture = new SpriteSheet(TEXTURE_DATA.inv.texturePath);
     this.id = id || 0;
     this.rarity = 'legendary';
     this.quantity = 1;
