@@ -7,7 +7,7 @@ const Vector=Matter.Vector;
 export class GameObject{
     constructor(label){
         this.label=label ||'GameObject';
-        this.tags='Tag';
+        this.tags=[];
         this.parent=null;
         this.active=true;
         this.transform={
