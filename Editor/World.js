@@ -134,18 +134,21 @@ class WorldEditor extends GameObject{
     const copy = this.availableTiles[this.slots.lastSelectedTileIndex].tile;
     const worldTile = new Tile(copy.label,copy.texture.img.src, Mouse.position);
     worldTile.texture=copy.texture; // gets all the texture data
-    worldTile.transform.position = this.translateToGrid(Mouse.position,worldTile.transform.size);
-    worldTile.texture.transform.position = this.translateToGrid(Mouse.position,worldTile.transform.size);
-
-      
+    //position that checks with camera position
+    const offsettedPosition=Vector.create(Mouse.position.x - Renderer.camera.transform.position.x,Mouse.position.y - Renderer.camera.transform.position.y);
+    worldTile.transform.position = this.translateToGrid(offsettedPosition,worldTile.transform.size);
+    worldTile.texture.transform.position = this.translateToGrid(offsettedPosition,worldTile.transform.size);
+    
+    
     let desiredLayerName=null;
-    let isLastTileUnderMouse=false;
     if(this.availableTiles[this.slots.lastSelectedTileIndex].tile) {
     desiredLayerName=this.availableTiles[this.slots.lastSelectedTileIndex].tile.desiredLayer;
     }
-    
+
+    let isLastTileUnderMouse=false;
     for(let i=0;i<Renderer.getLayer(desiredLayerName).length;i++){
     const toCheck=Renderer.getLayer(desiredLayerName)[i];
+    
     const offsettedPosition=Vector.create(toCheck.transform.position.x-toCheck.transform.size.x/2,toCheck.transform.position.y-toCheck.transform.size.y/2);
     isLastTileUnderMouse=Mouse.checkBoxCollision(offsettedPosition,toCheck.transform.size);  
     }
@@ -165,7 +168,10 @@ class WorldEditor extends GameObject{
     if(desiredLayerName){
       for(let i=0;i<Renderer.getLayer(desiredLayerName).length;i++){
         const tileToCheck=Renderer.getLayer(desiredLayerName)[i];
-        const offsettedPosition=Vector.create(tileToCheck.transform.position.x-tileToCheck.transform.size.x/2,tileToCheck.transform.position.y-tileToCheck.transform.size.y/2); 
+        const relativeX=tileToCheck.transform.position.x-tileToCheck.transform.size.x/2 + Renderer.camera.transform.position.x;
+        const relativeY=tileToCheck.transform.position.y-tileToCheck.transform.size.y/2 + Renderer.camera.transform.position.y;
+        const offsettedPosition=Vector.create(relativeX,relativeY);
+        // const offsettedPosition=Vector.create(tileToCheck.transform.position.x-tileToCheck.transform.size.x/2,tileToCheck.transform.position.y-tileToCheck.transform.size.y/2); 
           if(tileToCheck!==undefined && Mouse.checkBoxCollision(offsettedPosition,tileToCheck.transform.size)) {
             Renderer.removeFromLayer(tileToCheck,tileToCheck.desiredLayer);
             this.history.addAction('remove',tileToCheck);
@@ -294,6 +300,8 @@ document.addEventListener('keydown', (e) => {
   worldEdit.saveWorld(e);
 });
 
+const g=new Tile('grassclean',TEXTURE_DATA.grassclean.texturePath);
+g.texture.frameOffset=TEXTURE_DATA.grassclean.frameOffset;
 
 const gtl=new Tile('grasstopleft',TEXTURE_DATA.grasstopleft.texturePath);
 gtl.texture.frameOffset=TEXTURE_DATA.grasstopleft.frameOffset;
@@ -314,7 +322,7 @@ gbm.texture.frameOffset=TEXTURE_DATA.grassbotmid.frameOffset;
 const gbr=new Tile('grassbotright',TEXTURE_DATA.grassbotright.texturePath);
 gbr.texture.frameOffset=TEXTURE_DATA.grassbotright.frameOffset;
 
-worldEdit.addTileTypes([gtl,gtm,gtr,gml,gmm,gmr,gbl,gbm,gbr],'grass');
+worldEdit.addTileTypes([g,gtl,gtm,gtr,gml,gmm,gmr,gbl,gbm,gbr],'grass');
 
 
 setTimeout(()=>{
