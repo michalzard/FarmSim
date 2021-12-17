@@ -5,10 +5,7 @@ Vector=Matter.Vector
 
 export class RectangleCollider{
     constructor(worldToSpawn,position,size,isStatic){
-        this.position=position || Vector.create(0,0);
-        this.size=size || Vector.create(10,10);
-        this.isStatic=isStatic || false;
-        this.body=Bodies.rectangle(this.position.x,this.position.y,this.size.x,this.size.y,{isStatic:this.isStatic});
+        this.body=Bodies.rectangle(position.x,position.y,size.x,size.y,{isStatic:isStatic});
         /*
         expected format to add object to physical world
         Composite.add(engine.world, [boxA, boxB, ground]);
