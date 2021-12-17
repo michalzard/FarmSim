@@ -1,23 +1,17 @@
 const Vector=Matter.Vector;
 import Renderer from "../Game/scripts/Renderer.js";
 import {Tile, TilePattern} from "../Game/scripts/Objects.js";
-import SpriteSheet, {Textures} from "../Game/scripts/SpritesheetHandler.js";
+import SpriteSheet, {TEXTURE_DATA} from "../Game/scripts/SpritesheetHandler.js";
 import Canvas, { Mouse } from "../Game/scripts/Canvas.js";
 import { GameObject } from "../Game/scripts/GameObject.js";
-
-//debug only
-
-const t = new Tile("grass",new SpriteSheet(Textures.grass));
-const t2 = new Tile("inv", new SpriteSheet(Textures.inv));
-//
 
 class WorldEditor extends GameObject{
   constructor(){
     super();
-    this.active=false;
     this.availableTiles = [];
     this.defaultAvailableTiles = [];
     this.maxSlots = 36;
+    this.label="World Editor";
     this.slots = {
       lastSelectedTileIndex: -1, //default to -1 since there's tile usually at 0th index position
     };
@@ -83,12 +77,17 @@ class WorldEditor extends GameObject{
   }
   /**
    *  initializes spritesheets so textures can be used
-   * @param {*} sprite can pass single sprite or array of sprites  
+   * @param {*} tileArray can pass array of sprites
    * @param {*} category tag
    */
-  addTileTypes(tile, category) {
-    this.availableTiles.push({tile,category});
-    this.defaultAvailableTiles.push({tile,category});
+  addTileTypes(tileArray, category) {
+    if(Array.isArray(tileArray)){
+    for(let i=0;i<tileArray.length;i++){
+      const tile=tileArray[i];
+      this.availableTiles.push({tile,category});
+      this.defaultAvailableTiles.push({tile,category});    
+    }
+    }else return;
   }
 
   /**
@@ -133,9 +132,12 @@ class WorldEditor extends GameObject{
     //check if there's tile object in assigned tile 
     if (this.slots.lastSelectedTileIndex >= 0 && this.availableTiles[this.slots.lastSelectedTileIndex]!==undefined) {
     const copy = this.availableTiles[this.slots.lastSelectedTileIndex].tile;
-    const worldTile = new Tile(copy.label, copy.texture, Mouse.position);
+    const worldTile = new Tile(copy.label,copy.texture.img.src, Mouse.position);
+    worldTile.texture=copy.texture; // gets all the texture data
     worldTile.transform.position = this.translateToGrid(Mouse.position,worldTile.transform.size);
+    worldTile.texture.transform.position = this.translateToGrid(Mouse.position,worldTile.transform.size);
 
+      
     let desiredLayerName=null;
     let isLastTileUnderMouse=false;
     if(this.availableTiles[this.slots.lastSelectedTileIndex].tile) {
@@ -216,14 +218,13 @@ draw(ctx) {
     const position = Vector.create((Canvas.width - 430) + 50 + 60 * x, (Canvas.height / 2) + 75 + 60 * y);
 
     x++;
-    if (avTiles !== undefined) {
+    if (avTiles !== undefined) { 
       avTiles.tile.texture.transform.position = position;
       avTiles.tile.texture.draw(ctx);
     }
   }
   //shows currently selected tile
   this.displayGhostTile(ctx);
-  
   //that mouse box check is so that you dont create tile when inside of editor window because it places tile behind editor into world
   //if tile needed in that area just move your camera so that it isnt overlaping with window
   //add
@@ -239,11 +240,6 @@ draw(ctx) {
 
   ctx.restore();
 }
-  // static updateTools(){
-  //   if(this.tools.rectangle.tileMode==='pattern' && !Mouse.checkBoxCollision(Vector.create(Canvas.width-430,Canvas.height/2),Vector.create(400,420))) {
-  //     this.tools.rectangle.setOriginAndEnd();
-  //   }
-  // }
 
   saveWorld(e){
     if(e.ctrlKey && e.key==="s"){
@@ -264,18 +260,24 @@ draw(ctx) {
   }
   }
   loadWorld(worldName){
+    
     const mapData=localStorage.getItem(worldName);
+    if(mapData){
     const worldData=JSON.parse(mapData);
       for(let i=0;i<worldData.length;i++){
         const map=worldData[i];
         for(let j=0;j<map.data.length;j++){
           const mData=map.data[j];//tiles and other objects
           //using to lowercase so that it can correctly lookup needed texture
-          const texture=new SpriteSheet(Textures[mData.label.toLowerCase()]);
-          const tile=new Tile(mData.label,texture,mData.transform.position);
+          const mDataLabel=mData.label.toLowerCase();
+          const tile=new Tile(mDataLabel,TEXTURE_DATA[mDataLabel].texturePath,mData.transform.position);
+          tile.texture.frameOffset=TEXTURE_DATA[mDataLabel].frameOffset;
+          tile.texture.parent=tile;
+
           Renderer.addToLayer(tile,map.layer);
         }
-      }
+      }}
+      else return;
 
   }
   
@@ -292,16 +294,29 @@ document.addEventListener('keydown', (e) => {
   worldEdit.saveWorld(e);
 });
 
-// document.addEventListener('mousedown',(e)=>{
-//   if(e.buttons===1) WorldEditor.updateTools();
-// })
-/**
- * TODO: Rectangle tool that will select area and place pattern in that size
- */
 
-worldEdit.addTileTypes(t, "grass");
-worldEdit.addTileTypes(t2, "inventory");
+const gtl=new Tile('grasstopleft',TEXTURE_DATA.grasstopleft.texturePath);
+gtl.texture.frameOffset=TEXTURE_DATA.grasstopleft.frameOffset;
+const gtm=new Tile('grasstopmid',TEXTURE_DATA.grasstopmid.texturePath);
+gtm.texture.frameOffset=TEXTURE_DATA.grasstopmid.frameOffset;
+const gtr=new Tile('grasstopright',TEXTURE_DATA.grasstopright.texturePath);
+gtr.texture.frameOffset=TEXTURE_DATA.grasstopright.frameOffset;
+const gml=new Tile('grassmidleft',TEXTURE_DATA.grassmidleft.texturePath);
+gml.texture.frameOffset=TEXTURE_DATA.grassmidleft.frameOffset;
+const gmm=new Tile('grassmidmid',TEXTURE_DATA.grassmidmid.texturePath);
+gmm.texture.frameOffset=TEXTURE_DATA.grassmidmid.frameOffset;
+const gmr=new Tile('grassmidright',TEXTURE_DATA.grassmidright.texturePath);
+gmr.texture.frameOffset=TEXTURE_DATA.grassmidright.frameOffset;
+const gbl=new Tile('grassbotleft',TEXTURE_DATA.grassbotleft.texturePath);
+gbl.texture.frameOffset=TEXTURE_DATA.grassbotleft.frameOffset;
+const gbm=new Tile('grassbotmid',TEXTURE_DATA.grassbotmid.texturePath);
+gbm.texture.frameOffset=TEXTURE_DATA.grassbotmid.frameOffset;
+const gbr=new Tile('grassbotright',TEXTURE_DATA.grassbotright.texturePath);
+gbr.texture.frameOffset=TEXTURE_DATA.grassbotright.frameOffset;
+
+worldEdit.addTileTypes([gtl,gtm,gtr,gml,gmm,gmr,gbl,gbm,gbr],'grass');
+
 
 setTimeout(()=>{
-  worldEdit.loadWorld('map_name');
-},10);
+worldEdit.loadWorld('map_name');
+},20);
