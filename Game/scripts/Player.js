@@ -13,7 +13,6 @@ export default class Player extends GameObject{
     
     constructor(world,position){
         super();
-        this.size=Vector.create(40,60);
         this.input={
         up:false,
         down:false,
@@ -21,7 +20,8 @@ export default class Player extends GameObject{
         right:false,
         }
         this.maxSpeed=5;
-        this.collider=new RectangleCollider(world,this.position,this.size,false);
+        this.transform.size=new Vector.create(50,70)
+        this.collider=new RectangleCollider(world,position,this.transform.size,false);
         //this.texture=new SpriteSheet("./assets/testsheet.jpg",this.size);
         this.inventory=new Inventory(32)
         for(let i=0;i<115;i++)
@@ -34,13 +34,7 @@ export default class Player extends GameObject{
     }
     draw(){
     this.updatePosition();
-    this.collider.draw(ctx);
-
-    if(this.texture){
-        this.texture.update(this.collider.body.position,this.collider.body.angle);
-        this.texture.draw(ctx);
-    }
-    
+    this.collider.draw(ctx);   
     }
  
     updatePosition(){
