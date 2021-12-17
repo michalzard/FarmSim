@@ -1,11 +1,7 @@
-import SpriteSheet, {
-  Textures
-} from "./SpritesheetHandler.js";
+import SpriteSheet, { TEXTURE_DATA } from "./SpritesheetHandler.js";
 import Canvas from "./Canvas.js";
 import Renderer from "./Renderer.js";
-import {
-  GameObject
-} from "./GameObject.js";
+import { GameObject } from "./GameObject.js";
 
 
 const Vector = Matter.Vector;
@@ -15,17 +11,18 @@ class PlayerInvetoryUI extends GameObject {
   constructor() {
     super();
     this.label = 'InventoryUI';
+    this.active=false;
     // this.active=false;
-    this.invBack = new SpriteSheet(Textures.inv);
+    this.invBack = new SpriteSheet(TEXTURE_DATA.inv.texturePath);
     this.invBack.parent = this;
     //
-    this.heroBack = new SpriteSheet(Textures.inv);
+    this.heroBack = new SpriteSheet(TEXTURE_DATA.inv.texturePath);
     this.heroBack.parent = this;
     //
-    this.slots = new SpriteSheet(Textures.inv);
+    this.slots = new SpriteSheet(TEXTURE_DATA.inv.texturePath);
     this.slots.parent = this;
     //
-    this.goldTxt = new SpriteSheet(Textures.inv);
+    this.goldTxt = new SpriteSheet(TEXTURE_DATA.inv.texturePath);
     this.goldTxt.parent = this;
     window.addEventListener('keydown', (e) => { if (e.key === "b") { this.setActive(!this.active) }});
   }
