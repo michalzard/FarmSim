@@ -1,18 +1,20 @@
 const Vector=Matter.Vector;
 
 import { GameObject } from "./GameObject.js";
+import SpriteSheet from "./SpritesheetHandler.js";
 
 
 export class Tile extends GameObject{
-    constructor(label,texture,position){
+    constructor(label,textureSrc,position){
         super(label);
-        this.texture=texture;
-        this.transform.position=position;
+        this.texture=new SpriteSheet(textureSrc); //spritesheet will be used here
+        this.texture.parent=this;
+        this.transform.position=position || Vector.create(0,0);
         this.desiredLayer='background';
     }
     draw(ctx){
         if(this.texture){
-            this.texture.transform.position=this.transform.position;
+            this.texture.updatePositionWithParent(this.transform.position);
             this.texture.draw(ctx);
         }
     }
