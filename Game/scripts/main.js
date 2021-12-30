@@ -16,3 +16,5 @@ Runner.run(runner, engine);
 
 Renderer.render();//requestAnimationFrame 
 Player.init(engine.world);
+
+import TextureLoader from "./TextureLoader.js";

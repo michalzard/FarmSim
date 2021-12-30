@@ -1,5 +1,5 @@
 import {worldEdit as WorldEditor} from "../../Editor/World.js";
-import Canvas from "./Canvas.js";
+import Canvas,{Mouse} from "./Canvas.js";
 import { GameObject } from "./GameObject.js";
 import { playerUI as PlayerInvetoryUI } from "./UserInterFace.js";
 window.onload=Canvas.init();//inits canvas after whole page loads
@@ -18,9 +18,6 @@ class Camera extends GameObject{
         const relativeY=-targetsPosition.y + Canvas.height/2;
         this.transform.position=Vector.create(relativeX,relativeY);
     }
-    }
-    zoom(zoomVector){
-    this.transform.scale=Vector.create(zoomVector.x,zoomVector.y);
     }
 }
 
@@ -41,7 +38,7 @@ export default class Renderer{
         
         const player=Renderer.getLayer('entities')[0];
         if(player) Renderer.camera.follow(player.collider.body.position);
-        
+                
         ctx.save();
         ctx.translate(Renderer.camera.transform.position.x,Renderer.camera.transform.position.y);
         ctx.scale(Renderer.camera.transform.scale.x,Renderer.camera.transform.scale.y);

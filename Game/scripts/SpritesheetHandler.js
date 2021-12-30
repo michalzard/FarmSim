@@ -4,16 +4,14 @@
 const Vector=Matter.Vector;
 
 import { GameObject } from "./GameObject.js";
-import { worldEdit as WorldEditor } from "../../Editor/World.js";
 
 export default class SpriteSheet extends GameObject{
-    constructor(imageSrc){
+    constructor(ImageElement){
     super();
     this.label="Sprite Atlas";
-    this.img=new Image();
-    this.img.src=imageSrc || null;
-    this.frameSize=Vector.create(16,16); //cut out
-    this.frameOffset=Vector.create(0,0);//adds aditional pixels to cut out
+    this.img=ImageElement || null;
+    this.frameSize=Vector.create(32,32); //cut out
+    this.frameOffset=Vector.create(0,0);//adds aditional offset to origin of cut out
     this.angle=0;
     this.startingFrame=0;//offset to start on specific frame
     this.currentFrame=this.startingFrame;//currently displayed frame
@@ -38,6 +36,7 @@ export default class SpriteSheet extends GameObject{
     ctx.rotate(this.transform.angle);
     ctx.scale(this.transform.scale.x,this.transform.scale.y);
     //draw rect offset by half its size
+    if(this.img && this.frameOffset)
     ctx.drawImage(this.img,col * this.frameSize.x+this.frameOffset.x,
     row * this.frameSize.y + this.frameOffset.y,
     this.frameSize.x,this.frameSize.y,
@@ -62,54 +61,4 @@ export default class SpriteSheet extends GameObject{
     },timestep);
     }
 
-}
-
-const TEXTURE_PATHS={
-    Grass:"../Game/assets/grassdirt.png",
-    Inv:"../Game/assets/inventory.png"
-}
-export const TEXTURE_DATA={
-    inv:{
-        texturePath:TEXTURE_PATHS.Inv,
-    },
-    grassclean:{
-        texturePath:TEXTURE_PATHS.Grass,
-        frameOffset:new Vector.create(0,0),
-    },
-    grasstopleft : {
-        texturePath:TEXTURE_PATHS.Grass,
-        frameOffset:new Vector.create(0,32),
-    },
-    grasstopmid : {
-        texturePath:TEXTURE_PATHS.Grass,
-        frameOffset:new Vector.create(16,32),
-    },
-    grasstopright : {
-        texturePath:TEXTURE_PATHS.Grass,
-        frameOffset:new Vector.create(32,32),
-    },
-    grassmidleft : {
-        texturePath:TEXTURE_PATHS.Grass,
-        frameOffset:new Vector.create(0,48),
-    },
-    grassmidmid : {
-        texturePath:TEXTURE_PATHS.Grass,
-        frameOffset:new Vector.create(16,48),
-    },
-    grassmidright : {
-        texturePath:TEXTURE_PATHS.Grass,
-        frameOffset:new Vector.create(32,48),
-    },
-    grassbotleft : {
-        texturePath:TEXTURE_PATHS.Grass,
-        frameOffset:new Vector.create(0,64),
-    },
-    grassbotmid : {
-        texturePath:TEXTURE_PATHS.Grass,
-        frameOffset:new Vector.create(16,64),
-    },
-    grassbotright: {
-        texturePath:TEXTURE_PATHS.Grass,
-        frameOffset:new Vector.create(32,64),
-    },
 }
