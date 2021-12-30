@@ -5,16 +5,19 @@ import SpriteSheet from "./SpritesheetHandler.js";
 
 
 export class Tile extends GameObject{
-    constructor(label,textureSrc,position){
+    constructor(label,textureElement,textureOptions){
         super(label);
-        this.texture=new SpriteSheet(textureSrc); //spritesheet will be used here
+        this.texture=new SpriteSheet(textureElement); //spritesheet will be used here
+        this.texture.frameOffset=textureOptions.offset  ? textureOptions.offset : Vector.create(0,0);
+        this.texture.frameSize=textureOptions.frameSize  ? textureOptions.frameSize : Vector.create(32,32);
         this.texture.parent=this;
-        this.transform.position=position || Vector.create(0,0);
         this.desiredLayer='background';
     }
     draw(ctx){
         if(this.texture){
+            //testing
             this.texture.updatePositionWithParent(this.transform.position);
+            this.texture.transform.size=this.transform.size;
             this.texture.draw(ctx);
         }
     }

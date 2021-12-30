@@ -1,4 +1,5 @@
-import SpriteSheet, { TEXTURE_DATA } from "./SpritesheetHandler.js";
+import TextureLoader from "./TextureLoader.js";
+import SpriteSheet from "./SpritesheetHandler.js";
 
 export class Inventory {
   constructor(slotAmount) {
@@ -45,7 +46,7 @@ export class Inventory {
 export class Item {
   constructor(id) {
     this.label = "Testing Item";
-    this.texture = new SpriteSheet(TEXTURE_DATA.inv.texturePath);
+    this.texture = new SpriteSheet(TextureLoader.LoadTexture('inv').imgObject);
     this.id = id || 0;
     this.rarity = 'legendary';
     this.quantity = 1;
