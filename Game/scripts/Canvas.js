@@ -32,11 +32,12 @@ window.addEventListener("resize",()=>{Canvas.resize()});
 export class Mouse {
     static position=Vector.create(0,0);
     static button={left:false,right:false}
+    static delta=0;
     static updatePosition(e){
     this.position=Vector.create(e.clientX,e.clientY);
     }
-    static getDeta(e){
-    return e.deltaY/100;
+    static getDelta(e){
+    this.delta=-e.deltaY/100;
     }
     static checkBoxCollision(position,size){
     return (this.position.x >= position.x && this.position.y>=position.y && this.position.x<position.x+size.x && this.position.y<position.y+size.y);
@@ -53,5 +54,5 @@ export class Mouse {
 }
 window.addEventListener("mousedown",(e)=>{Mouse.onButtonDown(e);});
 window.addEventListener("mouseup",(e)=>{Mouse.onButtonUp(e);});
-
+window.addEventListener('wheel',(e)=>{Mouse.getDelta(e);});
 window.addEventListener("mousemove",(e)=>{Mouse.updatePosition(e);});
