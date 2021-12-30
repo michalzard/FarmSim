@@ -1,9 +1,10 @@
 const Vector=Matter.Vector;
 import Renderer from "../Game/scripts/Renderer.js";
 import {Tile, TilePattern} from "../Game/scripts/Objects.js";
-import SpriteSheet, {TEXTURE_DATA} from "../Game/scripts/SpritesheetHandler.js";
+import SpriteSheet from "../Game/scripts/SpritesheetHandler.js";
 import Canvas, { Mouse } from "../Game/scripts/Canvas.js";
 import { GameObject } from "../Game/scripts/GameObject.js";
+import TextureLoader from "../Game/scripts/TextureLoader.js";
 
 class WorldEditor extends GameObject{
   constructor(){
@@ -276,8 +277,11 @@ draw(ctx) {
           const mData=map.data[j];//tiles and other objects
           //using to lowercase so that it can correctly lookup needed texture
           const mDataLabel=mData.label.toLowerCase();
-          const tile=new Tile(mDataLabel,TEXTURE_DATA[mDataLabel].texturePath,mData.transform.position);
-          tile.texture.frameOffset=TEXTURE_DATA[mDataLabel].frameOffset;
+          const texture=TextureLoader.LoadTexture(mDataLabel);
+          const tile=new Tile(texture.label,texture.img,{size:texture.cutout.size , offset: texture.cutout.offset});
+          tile.transform.position=mData.transform.position;
+          tile.transform.size=texture.cutout.size;
+          console.log(texture)
           tile.texture.parent=tile;
 
           Renderer.addToLayer(tile,map.layer);
@@ -300,31 +304,93 @@ document.addEventListener('keydown', (e) => {
   worldEdit.saveWorld(e);
 });
 
-const g=new Tile('grassclean',TEXTURE_DATA.grassclean.texturePath);
-g.texture.frameOffset=TEXTURE_DATA.grassclean.frameOffset;
 
-const gtl=new Tile('grasstopleft',TEXTURE_DATA.grasstopleft.texturePath);
-gtl.texture.frameOffset=TEXTURE_DATA.grasstopleft.frameOffset;
-const gtm=new Tile('grasstopmid',TEXTURE_DATA.grasstopmid.texturePath);
-gtm.texture.frameOffset=TEXTURE_DATA.grasstopmid.frameOffset;
-const gtr=new Tile('grasstopright',TEXTURE_DATA.grasstopright.texturePath);
-gtr.texture.frameOffset=TEXTURE_DATA.grasstopright.frameOffset;
-const gml=new Tile('grassmidleft',TEXTURE_DATA.grassmidleft.texturePath);
-gml.texture.frameOffset=TEXTURE_DATA.grassmidleft.frameOffset;
-const gmm=new Tile('grassmidmid',TEXTURE_DATA.grassmidmid.texturePath);
-gmm.texture.frameOffset=TEXTURE_DATA.grassmidmid.frameOffset;
-const gmr=new Tile('grassmidright',TEXTURE_DATA.grassmidright.texturePath);
-gmr.texture.frameOffset=TEXTURE_DATA.grassmidright.frameOffset;
-const gbl=new Tile('grassbotleft',TEXTURE_DATA.grassbotleft.texturePath);
-gbl.texture.frameOffset=TEXTURE_DATA.grassbotleft.frameOffset;
-const gbm=new Tile('grassbotmid',TEXTURE_DATA.grassbotmid.texturePath);
-gbm.texture.frameOffset=TEXTURE_DATA.grassbotmid.frameOffset;
-const gbr=new Tile('grassbotright',TEXTURE_DATA.grassbotright.texturePath);
-gbr.texture.frameOffset=TEXTURE_DATA.grassbotright.frameOffset;
+worldEdit.addTileTypes([
+  new Tile('grassTopLeft',TextureLoader.LoadTexture('grassTopLeft').img,
+  {size:TextureLoader.LoadTexture('grassTopLeft').cutout.size,
+  offset:TextureLoader.LoadTexture('grassTopLeft').cutout.offset}),
 
-worldEdit.addTileTypes([g,gtl,gtm,gtr,gml,gmm,gmr,gbl,gbm,gbr],'grass');
+  new Tile('grassTopCenter',TextureLoader.LoadTexture('grassTopCenter').img,
+  {size:TextureLoader.LoadTexture('grassTopCenter').cutout.size,
+  offset:TextureLoader.LoadTexture('grassTopCenter').cutout.offset}),
 
+  new Tile('grassTopRight',TextureLoader.LoadTexture('grassTopRight').img,
+  {size:TextureLoader.LoadTexture('grassTopRight').cutout.size,
+  offset:TextureLoader.LoadTexture('grassTopRight').cutout.offset}),
+
+  new Tile('grassMidLeft',TextureLoader.LoadTexture('grassMidLeft').img,
+  {size:TextureLoader.LoadTexture('grassMidLeft').cutout.size,
+  offset:TextureLoader.LoadTexture('grassMidLeft').cutout.offset}),
+
+  new Tile('grassMidCenter',TextureLoader.LoadTexture('grassMidCenter').img,
+  {size:TextureLoader.LoadTexture('grassMidCenter').cutout.size,
+  offset:TextureLoader.LoadTexture('grassMidCenter').cutout.offset}),
+
+  new Tile('grassMidRight',TextureLoader.LoadTexture('grassMidRight').img,
+  {size:TextureLoader.LoadTexture('grassMidRight').cutout.size,
+  offset:TextureLoader.LoadTexture('grassMidRight').cutout.offset}),
+  
+  new Tile('grassBotLeft',TextureLoader.LoadTexture('grassBotLeft').img,
+  {size:TextureLoader.LoadTexture('grassBotLeft').cutout.size,
+  offset:TextureLoader.LoadTexture('grassBotLeft').cutout.offset}),
+
+  new Tile('grassBotCenter',TextureLoader.LoadTexture('grassBotCenter').img,
+  {size:TextureLoader.LoadTexture('grassBotCenter').cutout.size,
+  offset:TextureLoader.LoadTexture('grassBotCenter').cutout.offset}),
+
+  new Tile('grassBotRight',TextureLoader.LoadTexture('grassBotRight').img,
+  {size:TextureLoader.LoadTexture('grassBotRight').cutout.size,
+  offset:TextureLoader.LoadTexture('grassBotRight').cutout.offset}),
+
+  new Tile('water',TextureLoader.LoadTexture('water').img,
+  {size:TextureLoader.LoadTexture('water').cutout.size,
+  offset:TextureLoader.LoadTexture('water').cutout.offset}),
+
+],'grass')
+
+
+worldEdit.addTileTypes([
+new Tile('dirt',TextureLoader.LoadTexture('dirt').img,
+{size:TextureLoader.LoadTexture('dirt').cutout.size,
+offset:TextureLoader.LoadTexture('dirt').cutout.offset}),
+
+new Tile('dirtTopLeft',TextureLoader.LoadTexture('dirtTopLeft').img,
+{size:TextureLoader.LoadTexture('dirtTopLeft').cutout.size,
+offset:TextureLoader.LoadTexture('dirtTopLeft').cutout.offset}),
+new Tile('dirtTopCenter',TextureLoader.LoadTexture('dirtTopCenter').img,
+{size:TextureLoader.LoadTexture('dirtTopCenter').cutout.size,
+offset:TextureLoader.LoadTexture('dirtTopCenter').cutout.offset}),
+new Tile('dirtTopRight',TextureLoader.LoadTexture('dirtTopRight').img,
+{size:TextureLoader.LoadTexture('dirtTopRight').cutout.size,
+offset:TextureLoader.LoadTexture('dirtTopRight').cutout.offset}),
+
+new Tile('dirtMidLeft',TextureLoader.LoadTexture('dirtMidLeft').img,
+{size:TextureLoader.LoadTexture('dirtMidLeft').cutout.size,
+offset:TextureLoader.LoadTexture('dirtMidLeft').cutout.offset}),
+new Tile('dirtMidCenter',TextureLoader.LoadTexture('dirtMidCenter').img,
+{size:TextureLoader.LoadTexture('dirtMidCenter').cutout.size,
+offset:TextureLoader.LoadTexture('dirtMidCenter').cutout.offset}),
+new Tile('dirtMidRight',TextureLoader.LoadTexture('dirtMidRight').img,
+{size:TextureLoader.LoadTexture('dirtMidRight').cutout.size,
+offset:TextureLoader.LoadTexture('dirtMidRight').cutout.offset}),
+
+new Tile('dirtBotLeft',TextureLoader.LoadTexture('dirtBotLeft').img,
+{size:TextureLoader.LoadTexture('dirtBotLeft').cutout.size,
+offset:TextureLoader.LoadTexture('dirtBotLeft').cutout.offset}),
+new Tile('dirtBotCenter',TextureLoader.LoadTexture('dirtBotCenter').img,
+{size:TextureLoader.LoadTexture('dirtBotCenter').cutout.size,
+offset:TextureLoader.LoadTexture('dirtBotCenter').cutout.offset}),
+new Tile('dirtBotRight',TextureLoader.LoadTexture('dirtBotRight').img,
+{size:TextureLoader.LoadTexture('dirtBotRight').cutout.size,
+offset:TextureLoader.LoadTexture('dirtBotRight').cutout.offset}),
+
+
+],'dirt')
+
+console.log(worldEdit.availableTiles)
 
 setTimeout(()=>{
-worldEdit.loadWorld('map_name');
-},20);
+
+  worldEdit.loadWorld('map_name');
+
+},30);
