@@ -12,7 +12,7 @@ export class GameObject{
         this.active=true;
         this.transform={
             position:Vector.create(100,100),
-            size:Vector.create(40,40),
+            size:Vector.create(80,80),
             angle:0,
             scale:Vector.create(1,1),
         }

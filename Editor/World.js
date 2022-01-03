@@ -1,6 +1,6 @@
 const Vector=Matter.Vector;
 import Renderer from "../Game/scripts/Renderer.js";
-import {Tile, TilePattern} from "../Game/scripts/Objects.js";
+import {Tile} from "../Game/scripts/Objects.js";
 import SpriteSheet from "../Game/scripts/SpritesheetHandler.js";
 import Canvas, { Mouse } from "../Game/scripts/Canvas.js";
 import { GameObject } from "../Game/scripts/GameObject.js";
@@ -78,15 +78,15 @@ class WorldEditor extends GameObject{
   }
   /**
    *  initializes spritesheets so textures can be used
-   * @param {*} tileArray can pass array of sprites
+   * @param {*} textureArray can pass array of sprites
    * @param {*} category tag
    */
-  addTileTypes(tileArray, category) {
-    if(Array.isArray(tileArray)){
-    for(let i=0;i<tileArray.length;i++){
-      const tile=tileArray[i];
-      this.availableTiles.push({tile,category});
-      this.defaultAvailableTiles.push({tile,category});    
+  addTileTypes(textureArray, category) {
+    if(Array.isArray(textureArray)){
+    for(let i=0;i<textureArray.length;i++){
+      const texture=textureArray[i];
+      this.availableTiles.push({texture,category});
+      this.defaultAvailableTiles.push({texture,category});    
     }
     }else return;
   }
@@ -101,8 +101,9 @@ class WorldEditor extends GameObject{
       ctx.globalAlpha = 0.4;
       const currentTile = this.availableTiles[this.slots.lastSelectedTileIndex];
       if(currentTile){
-      currentTile.tile.texture.transform.position = Mouse.position;
-      currentTile.tile.texture.draw(ctx);
+      currentTile.texture.sprite.transform.size=currentTile.texture.tileSize;
+      currentTile.texture.sprite.transform.position = Mouse.position;
+      currentTile.texture.sprite.draw(ctx);
       }
       ctx.restore();
     }
@@ -132,9 +133,10 @@ class WorldEditor extends GameObject{
   addTileToWorld() {
     //check if there's tile object in assigned tile 
     if (this.slots.lastSelectedTileIndex >= 0 && this.availableTiles[this.slots.lastSelectedTileIndex]!==undefined) {
-    const copy = this.availableTiles[this.slots.lastSelectedTileIndex].tile;
-    const worldTile = new Tile(copy.label,copy.texture.img.src, Mouse.position);
-    worldTile.texture=copy.texture; // gets all the texture data
+    const copy = this.availableTiles[this.slots.lastSelectedTileIndex].texture.sprite;
+    const worldTile = new Tile(copy.label,copy.img, Mouse.position);
+    // worldTile.texture.frameSize=copy.size;
+
     //position that checks with camera position
     const offsettedPosition=Vector.create(Mouse.position.x - Renderer.camera.transform.position.x,Mouse.position.y - Renderer.camera.transform.position.y);
     worldTile.transform.position = this.translateToGrid(offsettedPosition,worldTile.transform.size);
@@ -142,8 +144,8 @@ class WorldEditor extends GameObject{
     
     
     let desiredLayerName=null;
-    if(this.availableTiles[this.slots.lastSelectedTileIndex].tile) {
-    desiredLayerName=this.availableTiles[this.slots.lastSelectedTileIndex].tile.desiredLayer;
+    if(this.availableTiles[this.slots.lastSelectedTileIndex].texture.sprite) {
+    desiredLayerName=this.availableTiles[this.slots.lastSelectedTileIndex].texture.sprite.desiredLayer;
     }
 
     let isLastTileUnderMouse=false;
@@ -164,7 +166,7 @@ class WorldEditor extends GameObject{
   removeTileFromWorld(){
     let desiredLayerName=null;
     if(this.availableTiles[this.slots.lastSelectedTileIndex]!==undefined) {
-    desiredLayerName=this.availableTiles[this.slots.lastSelectedTileIndex].tile.desiredLayer;
+    desiredLayerName=this.availableTiles[this.slots.lastSelectedTileIndex].texture.sprite.desiredLayer;
     }
     if(desiredLayerName){
       for(let i=0;i<Renderer.getLayer(desiredLayerName).length;i++){
@@ -217,7 +219,6 @@ draw(ctx) {
   for (let i = 0 + (this.currentPage - 1) * this.maxSlots; i < this.maxSlots * this.currentPage; i++) {
 
     const avTiles = this.availableTiles[i];
-
     if (x % 6 == 0 && x != 0) {
       x = 0;
       y++;
@@ -226,8 +227,9 @@ draw(ctx) {
 
     x++;
     if (avTiles !== undefined) { 
-      avTiles.tile.texture.transform.position = position;
-      avTiles.tile.texture.draw(ctx);
+    avTiles.texture.sprite.transform.position=position;
+    avTiles.texture.sprite.transform.size=Vector.create(40,40);
+    avTiles.texture.sprite.draw(ctx);
     }
   }
   //shows currently selected tile
@@ -281,7 +283,6 @@ draw(ctx) {
           const tile=new Tile(texture.label,texture.img,{size:texture.cutout.size , offset: texture.cutout.offset});
           tile.transform.position=mData.transform.position;
           tile.transform.size=texture.cutout.size;
-          console.log(texture)
           tile.texture.parent=tile;
 
           Renderer.addToLayer(tile,map.layer);
@@ -304,93 +305,20 @@ document.addEventListener('keydown', (e) => {
   worldEdit.saveWorld(e);
 });
 
-
 worldEdit.addTileTypes([
-  new Tile('grassTopLeft',TextureLoader.LoadTexture('grassTopLeft').img,
-  {size:TextureLoader.LoadTexture('grassTopLeft').cutout.size,
-  offset:TextureLoader.LoadTexture('grassTopLeft').cutout.offset}),
+{
+  sprite:new SpriteSheet(TextureLoader.LoadTexture('dirt').img),
+  size:TextureLoader.LoadTexture('dirt').cutout.frameSize,
+  tileSize:Vector.create(60,60),
+  offset:TextureLoader.LoadTexture('dirt').cutout.offset,
+}
 
-  new Tile('grassTopCenter',TextureLoader.LoadTexture('grassTopCenter').img,
-  {size:TextureLoader.LoadTexture('grassTopCenter').cutout.size,
-  offset:TextureLoader.LoadTexture('grassTopCenter').cutout.offset}),
+],'dirt');
 
-  new Tile('grassTopRight',TextureLoader.LoadTexture('grassTopRight').img,
-  {size:TextureLoader.LoadTexture('grassTopRight').cutout.size,
-  offset:TextureLoader.LoadTexture('grassTopRight').cutout.offset}),
+console.log(worldEdit.availableTiles);
 
-  new Tile('grassMidLeft',TextureLoader.LoadTexture('grassMidLeft').img,
-  {size:TextureLoader.LoadTexture('grassMidLeft').cutout.size,
-  offset:TextureLoader.LoadTexture('grassMidLeft').cutout.offset}),
-
-  new Tile('grassMidCenter',TextureLoader.LoadTexture('grassMidCenter').img,
-  {size:TextureLoader.LoadTexture('grassMidCenter').cutout.size,
-  offset:TextureLoader.LoadTexture('grassMidCenter').cutout.offset}),
-
-  new Tile('grassMidRight',TextureLoader.LoadTexture('grassMidRight').img,
-  {size:TextureLoader.LoadTexture('grassMidRight').cutout.size,
-  offset:TextureLoader.LoadTexture('grassMidRight').cutout.offset}),
-  
-  new Tile('grassBotLeft',TextureLoader.LoadTexture('grassBotLeft').img,
-  {size:TextureLoader.LoadTexture('grassBotLeft').cutout.size,
-  offset:TextureLoader.LoadTexture('grassBotLeft').cutout.offset}),
-
-  new Tile('grassBotCenter',TextureLoader.LoadTexture('grassBotCenter').img,
-  {size:TextureLoader.LoadTexture('grassBotCenter').cutout.size,
-  offset:TextureLoader.LoadTexture('grassBotCenter').cutout.offset}),
-
-  new Tile('grassBotRight',TextureLoader.LoadTexture('grassBotRight').img,
-  {size:TextureLoader.LoadTexture('grassBotRight').cutout.size,
-  offset:TextureLoader.LoadTexture('grassBotRight').cutout.offset}),
-
-  new Tile('water',TextureLoader.LoadTexture('water').img,
-  {size:TextureLoader.LoadTexture('water').cutout.size,
-  offset:TextureLoader.LoadTexture('water').cutout.offset}),
-
-],'grass')
+setTimeout(()=>{worldEdit.loadWorld('map_name');},30);
 
 
-worldEdit.addTileTypes([
-new Tile('dirt',TextureLoader.LoadTexture('dirt').img,
-{size:TextureLoader.LoadTexture('dirt').cutout.size,
-offset:TextureLoader.LoadTexture('dirt').cutout.offset}),
-
-new Tile('dirtTopLeft',TextureLoader.LoadTexture('dirtTopLeft').img,
-{size:TextureLoader.LoadTexture('dirtTopLeft').cutout.size,
-offset:TextureLoader.LoadTexture('dirtTopLeft').cutout.offset}),
-new Tile('dirtTopCenter',TextureLoader.LoadTexture('dirtTopCenter').img,
-{size:TextureLoader.LoadTexture('dirtTopCenter').cutout.size,
-offset:TextureLoader.LoadTexture('dirtTopCenter').cutout.offset}),
-new Tile('dirtTopRight',TextureLoader.LoadTexture('dirtTopRight').img,
-{size:TextureLoader.LoadTexture('dirtTopRight').cutout.size,
-offset:TextureLoader.LoadTexture('dirtTopRight').cutout.offset}),
-
-new Tile('dirtMidLeft',TextureLoader.LoadTexture('dirtMidLeft').img,
-{size:TextureLoader.LoadTexture('dirtMidLeft').cutout.size,
-offset:TextureLoader.LoadTexture('dirtMidLeft').cutout.offset}),
-new Tile('dirtMidCenter',TextureLoader.LoadTexture('dirtMidCenter').img,
-{size:TextureLoader.LoadTexture('dirtMidCenter').cutout.size,
-offset:TextureLoader.LoadTexture('dirtMidCenter').cutout.offset}),
-new Tile('dirtMidRight',TextureLoader.LoadTexture('dirtMidRight').img,
-{size:TextureLoader.LoadTexture('dirtMidRight').cutout.size,
-offset:TextureLoader.LoadTexture('dirtMidRight').cutout.offset}),
-
-new Tile('dirtBotLeft',TextureLoader.LoadTexture('dirtBotLeft').img,
-{size:TextureLoader.LoadTexture('dirtBotLeft').cutout.size,
-offset:TextureLoader.LoadTexture('dirtBotLeft').cutout.offset}),
-new Tile('dirtBotCenter',TextureLoader.LoadTexture('dirtBotCenter').img,
-{size:TextureLoader.LoadTexture('dirtBotCenter').cutout.size,
-offset:TextureLoader.LoadTexture('dirtBotCenter').cutout.offset}),
-new Tile('dirtBotRight',TextureLoader.LoadTexture('dirtBotRight').img,
-{size:TextureLoader.LoadTexture('dirtBotRight').cutout.size,
-offset:TextureLoader.LoadTexture('dirtBotRight').cutout.offset}),
-
-
-],'dirt')
-
-console.log(worldEdit.availableTiles)
-
-setTimeout(()=>{
-
-  worldEdit.loadWorld('map_name');
-
-},30);
+//TODO : work out cleaner way to put object to ingame world
+//

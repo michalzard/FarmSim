@@ -12,7 +12,6 @@ export default class SpriteSheet extends GameObject{
     this.img=ImageElement || null;
     this.frameSize=Vector.create(32,32); //cut out
     this.frameOffset=Vector.create(0,0);//adds aditional offset to origin of cut out
-    this.angle=0;
     this.startingFrame=0;//offset to start on specific frame
     this.currentFrame=this.startingFrame;//currently displayed frame
     //cols,rows
@@ -21,7 +20,7 @@ export default class SpriteSheet extends GameObject{
     //inital setup for sprite looping
     this.loopTimestep=100;
     this.loop(this.loopTimestep);
-    
+    this.desiredLayer='background';
     }
 
     draw(ctx){
