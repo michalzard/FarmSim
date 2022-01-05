@@ -35,12 +35,7 @@ export default class SpriteSheet extends GameObject{
     ctx.rotate(this.transform.angle);
     ctx.scale(this.transform.scale.x,this.transform.scale.y);
     //draw rect offset by half its size
-    if(this.img && this.frameOffset)
-    ctx.drawImage(this.img,col * this.frameSize.x+this.frameOffset.x,
-    row * this.frameSize.y + this.frameOffset.y,
-    this.frameSize.x,this.frameSize.y,
-    -this.transform.size.x/2,-this.transform.size.y/2
-    ,this.transform.size.x,this.transform.size.y);
+    if(this.img) ctx.drawImage(this.img,col * this.frameSize.x+this.frameOffset.x,row * this.frameSize.y + this.frameOffset.y,this.frameSize.x,this.frameSize.y,-this.transform.size.x/2,-this.transform.size.y/2,this.transform.size.x,this.transform.size.y);
     ctx.restore();
     }
     }

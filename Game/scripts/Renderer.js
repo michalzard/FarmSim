@@ -1,5 +1,5 @@
 import {worldEdit as WorldEditor} from "../../Editor/World.js";
-import Canvas,{Mouse} from "./Canvas.js";
+import Canvas from "./Canvas.js";
 import { GameObject } from "./GameObject.js";
 import { playerUI as PlayerInvetoryUI } from "./UserInterFace.js";
 window.onload=Canvas.init();//inits canvas after whole page loads
@@ -10,6 +10,7 @@ class Camera extends GameObject{
     constructor(){
         super();
         this.label='Player Camera';
+        
         this.transform.position=Vector.create(Canvas.width/2,Canvas.height/2);
     }
     follow(targetsPosition){
@@ -101,8 +102,6 @@ export default class Renderer{
         if(foundEntity>=0)layer.splice(foundEntity,1);
     }
 }
-
-console.log(Renderer.camera);
 
 //added ui elements
 Renderer.addToLayer(WorldEditor,'ui');

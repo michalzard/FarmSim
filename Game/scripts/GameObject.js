@@ -9,6 +9,7 @@ export class GameObject{
         this.label=label ||'GameObject';
         this.tags=[];
         this.parent=null;
+        this.type='GameObject';
         this.active=true;
         this.transform={
             position:Vector.create(100,100),

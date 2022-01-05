@@ -101,7 +101,9 @@ class WorldEditor extends GameObject{
       ctx.globalAlpha = 0.4;
       const currentTile = this.availableTiles[this.slots.lastSelectedTileIndex];
       if(currentTile){
-      currentTile.texture.sprite.transform.size=currentTile.texture.tileSize;
+      currentTile.texture.sprite.frameSize = currentTile.texture.frameSize;
+      currentTile.texture.sprite.frameOffset = currentTile.texture.offset;
+      currentTile.texture.sprite.transform.size = currentTile.texture.size;
       currentTile.texture.sprite.transform.position = Mouse.position;
       currentTile.texture.sprite.draw(ctx);
       }
@@ -133,10 +135,12 @@ class WorldEditor extends GameObject{
   addTileToWorld() {
     //check if there's tile object in assigned tile 
     if (this.slots.lastSelectedTileIndex >= 0 && this.availableTiles[this.slots.lastSelectedTileIndex]!==undefined) {
-    const copy = this.availableTiles[this.slots.lastSelectedTileIndex].texture.sprite;
-    const worldTile = new Tile(copy.label,copy.img, Mouse.position);
-    // worldTile.texture.frameSize=copy.size;
-
+    const copy = this.availableTiles[this.slots.lastSelectedTileIndex].texture;
+    const worldTile = new Tile(copy.label,copy.sprite.img, Mouse.position);
+    //texture data
+    worldTile.texture.frameSize=copy.frameSize;
+    worldTile.texture.frameOffset=copy.offset;
+    worldTile.transform.size=copy.size;
     //position that checks with camera position
     const offsettedPosition=Vector.create(Mouse.position.x - Renderer.camera.transform.position.x,Mouse.position.y - Renderer.camera.transform.position.y);
     worldTile.transform.position = this.translateToGrid(offsettedPosition,worldTile.transform.size);
@@ -147,7 +151,7 @@ class WorldEditor extends GameObject{
     if(this.availableTiles[this.slots.lastSelectedTileIndex].texture.sprite) {
     desiredLayerName=this.availableTiles[this.slots.lastSelectedTileIndex].texture.sprite.desiredLayer;
     }
-
+    console.log(Renderer.layers.background)
     let isLastTileUnderMouse=false;
     for(let i=0;i<Renderer.getLayer(desiredLayerName).length;i++){
     const toCheck=Renderer.getLayer(desiredLayerName)[i];
@@ -228,7 +232,9 @@ draw(ctx) {
     x++;
     if (avTiles !== undefined) { 
     avTiles.texture.sprite.transform.position=position;
-    avTiles.texture.sprite.transform.size=Vector.create(40,40);
+    avTiles.texture.sprite.frameSize=avTiles.texture.frameSize;
+    avTiles.texture.sprite.frameOffset=avTiles.texture.offset;
+    avTiles.texture.sprite.transform.size=Vector.create(40,40); // preview size
     avTiles.texture.sprite.draw(ctx);
     }
   }
@@ -255,17 +261,19 @@ draw(ctx) {
     const allLayers=Object.entries(Renderer.layers).filter(el=>{
      return el[0]!=='entities' && el[0]!=='ui'
     });
-    let jsonData=[];
+    const jsonData=[];
     for(let i=0;i<allLayers.length;i++){
       const layerName=allLayers[i][0];
       const layerArray=allLayers[i][1];
       //filtered out texture object containing animation info which is not needed when saving info about world
-      const ommitedArray=layerArray.map(el=>{const {transform,label}=el;return {label,transform};});
+      const ommitedArray=layerArray.map(el=>{
+      const {transform,label,type,texture}=el; const {frameOffset,frameSize} = texture;
+      return {label,type,transform,frameOffset,frameSize};});
       jsonData.push({layer:layerName,data:ommitedArray});
     }
     const mapName='map_name';
     localStorage.setItem(mapName,JSON.stringify(jsonData)); 
-    console.log(`${mapName} World Saved`)
+    console.log(`${mapName} World Saved`);
   }
   }
   loadWorld(worldName){
@@ -279,13 +287,31 @@ draw(ctx) {
           const mData=map.data[j];//tiles and other objects
           //using to lowercase so that it can correctly lookup needed texture
           const mDataLabel=mData.label.toLowerCase();
-          const texture=TextureLoader.LoadTexture(mDataLabel);
-          const tile=new Tile(texture.label,texture.img,{size:texture.cutout.size , offset: texture.cutout.offset});
-          tile.transform.position=mData.transform.position;
-          tile.transform.size=texture.cutout.size;
-          tile.texture.parent=tile;
-
-          Renderer.addToLayer(tile,map.layer);
+          const mDataType=mData.type.toLowerCase();
+          if(typeof mDataType === 'string'){
+          //set object to load into world
+          let objectToPush;
+          switch(mDataType){
+            case 'tile' : 
+              const texture=TextureLoader.LoadTexture(mDataLabel);
+              const tile=new Tile(texture.label,texture.img,{offset:texture.frameOffset,frameSize:texture.frameSize});
+              tile.transform.position=mData.transform.position;
+              tile.transform.size=texture.size;
+              tile.texture.frameSize=texture.cutout.frameSize;
+              tile.texture.frameOffset=texture.cutout.offset;
+              tile.texture.parent=tile;
+              objectToPush=tile;
+            break;
+            case 'foliage' : 
+            console.log('foliage');
+            break;
+            case 'building' : 
+            console.log('buildings');
+            break;
+          }
+          if(objectToPush!==undefined){
+          Renderer.addToLayer(objectToPush,objectToPush.desiredLayer);
+        }}
         }
       }}
       else return;
@@ -294,7 +320,6 @@ draw(ctx) {
   
 }
 export const worldEdit=new WorldEditor();
-
 worldEdit.input.style="display:none";//hide it by default
 document.body.append(worldEdit.input);
 
@@ -304,18 +329,53 @@ document.addEventListener('keydown', (e) => {
   worldEdit.history.handleUndoAndRedo(e);
   worldEdit.saveWorld(e);
 });
-
-worldEdit.addTileTypes([
-{
-  sprite:new SpriteSheet(TextureLoader.LoadTexture('dirt').img),
-  size:TextureLoader.LoadTexture('dirt').cutout.frameSize,
-  tileSize:Vector.create(60,60),
-  offset:TextureLoader.LoadTexture('dirt').cutout.offset,
+//load texture data into format
+function getTextureObject(textureName){
+  if(typeof textureName !== "string") return;
+  else return {
+    label:TextureLoader.LoadTexture(textureName).label,
+    sprite:new SpriteSheet(TextureLoader.LoadTexture(textureName).img),
+    frameSize:TextureLoader.LoadTexture(textureName).cutout.frameSize,
+    size:TextureLoader.LoadTexture(textureName).size,
+    offset:TextureLoader.LoadTexture(textureName).cutout.offset,
+  }
 }
 
+
+worldEdit.addTileTypes([
+  getTextureObject('water'),
+  getTextureObject('grassTopLeft'),
+  getTextureObject('grassTopCenter'),
+  getTextureObject('grassTopRight'),
+  getTextureObject('grassMidLeft'),
+  getTextureObject('grassMidCenter'),
+  getTextureObject('grassMidRight'),
+  getTextureObject('grassBotLeft'),
+  getTextureObject('grassBotCenter'),
+  getTextureObject('grassBotRight'),
+  getTextureObject('grassBotCornerLeft'),
+  getTextureObject('grassBotCornerRight'),
 ],'dirt');
 
-console.log(worldEdit.availableTiles);
+worldEdit.addTileTypes([
+getTextureObject('dirt'),
+getTextureObject('dirtTopLeft'),
+getTextureObject('dirtTopCenter'),
+getTextureObject('dirtTopRight'),
+getTextureObject('dirtMidLeft'),
+getTextureObject('dirtMidCenter'),
+getTextureObject('dirtMidRight'),
+getTextureObject('dirtBotLeft'),
+getTextureObject('dirtBotCenter'),
+getTextureObject('dirtBotRight'),
+],'dirt');
+
+worldEdit.addTileTypes([
+  getTextureObject('rock_1'),
+  getTextureObject('rock_2'),
+  getTextureObject('rock_3'),
+  getTextureObject('rock_4'),
+],'foliage');
 
 setTimeout(()=>{worldEdit.loadWorld('map_name');},30);
 

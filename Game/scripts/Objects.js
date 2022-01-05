@@ -7,6 +7,7 @@ import SpriteSheet from "./SpritesheetHandler.js";
 export class Tile extends GameObject{
     constructor(label,textureElement,textureOptions){
         super(label);
+        this.type='Tile';
         this.texture=new SpriteSheet(textureElement); //spritesheet will be used here
         this.texture.frameOffset=textureOptions.offset  ? textureOptions.offset : Vector.create(0,0);
         this.texture.frameSize=textureOptions.frameSize  ? textureOptions.frameSize : Vector.create(32,32);
@@ -43,5 +44,14 @@ export class TilePattern extends Tile{
         tempCanvas.width=texture.size.x;tempCanvas.height=texture.size.y;
         tCtx.drawImage(texture.img,0,0,desiredSize.x,desiredSize.y,0,0,texture.size.x,texture.size.y);
         return tempCanvas;
+    }
+}
+
+// grass leafs, rocks, ores etc.
+
+export class Foliage extends Tile{
+    constructor(label,textureElement,textureOptions){
+        super(label,textureElement,textureOptions);
+        this.colliders=[];
     }
 }
