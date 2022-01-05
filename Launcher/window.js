@@ -3,13 +3,13 @@ require('dotenv').config();
 
 function createWindow () {
   const gameWindow = new BrowserWindow({
-    autoHideMenuBar:true,
+    autoHideMenuBar:false,
     width:screen.getPrimaryDisplay().size.width || 1080,
     height:screen.getPrimaryDisplay().size.height || 720,
     webPreferences:{
-    devTools:process.env.ENV_MODE==="DEBUG" ? true : false,
+    devTools:true,
     },
-    fullscreen:true,
+    fullscreen:false,
     frame:process.env.ENV_MODE==="DEBUG" ? true : false,    
 });
 gameWindow.loadFile('../Game/index.html');

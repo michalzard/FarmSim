@@ -19,6 +19,6 @@
   "homepage": "https://github.com/michalzard/FarmSim#readme",
   "devDependencies": {
     "dotenv": "^10.0.0",
-    "electron": "^15.3.0"
+    "electron": "^15.3.4"
   }
 }
