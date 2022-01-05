@@ -4,9 +4,7 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ./Launcher/window.js",
-    "server": "node ./Launcher/server/index.js",
-    "server-dev": "nodemon ./Launcher/server/index.js"
+    "start": "electron ./Launcher/window.js"
   },
   "repository": {
     "type": "git",
