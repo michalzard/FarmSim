@@ -15,4 +15,6 @@ scene.run();
 
 const player=new Player();
 
-const testTiles=GrassTile.create('top-left',Vector.create(300,300));
+GrassTile.create('mid',Vector.create(400,360));
+GrassTile.create('top-left',Vector.create(300,300));
+GrassTile.create('top',Vector.create(360,300));

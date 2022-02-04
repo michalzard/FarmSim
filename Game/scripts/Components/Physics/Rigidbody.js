@@ -13,7 +13,7 @@ export default class Rigidbody extends Component{
     super();
     //TODO: set initial position differently
     this.label='Rigidbody';
-    this.originPoint=originPoint || Vector.create(300,300);//initial position
+    this.originPoint=originPoint;//initial position
     this.colliders=[];
     this.hitbox=new BoxRenderer();
     this.addCollider(new BoxCollider());
@@ -33,7 +33,8 @@ export default class Rigidbody extends Component{
             }
         
         const firstCollider=this.getColliderByIndex(0);
-        if(firstCollider && this.gameObject instanceof Player) this.gameObject.transform.position=firstCollider.body.position;
+        if(firstCollider && this.gameObject instanceof Player)
+        this.gameObject.transform.position=Vector.create(firstCollider.body.position.x-firstCollider.offset.x,firstCollider.body.position.y-firstCollider.offset.y);
         else this.gameObject.transform.position=this.originPoint;
     }
     }

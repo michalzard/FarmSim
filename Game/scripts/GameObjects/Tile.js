@@ -25,24 +25,44 @@ export class GrassTile extends GameObject {
         tile.setDirection(direction);
         switch(tile.direction){
             case "top-left" : 
-            const rb=new Rigidbody(Vector.create(350,350));
+            const rb=new Rigidbody(position);
             rb.getColliderByIndex(0).setStatic(true);
-            rb.getColliderByIndex(0).size=Vector.create(60,10);
-            rb.getColliderByIndex(0).offset=Vector.create(0,-25);
+            rb.getColliderByIndex(0).size=Vector.create(60,15);
+            rb.getColliderByIndex(0).offset=Vector.create(0,-22);
             rb.addCollider(new BoxCollider());
             rb.getColliderByIndex(1).setStatic(true);
-            rb.getColliderByIndex(1).size=Vector.create(10,50);
-            rb.getColliderByIndex(1).offset=Vector.create(-25,5);
+            rb.getColliderByIndex(1).size=Vector.create(15,60);
+            rb.getColliderByIndex(1).offset=Vector.create(-30,0);
             tile.addComponent(rb);
             break;
-            case "top" : tile.getComponentWithIndex(0).frameOffset=Vector.create(32,0); break;
-            case "top-right" :tile.getComponentWithIndex(0).frameOffset=Vector.create(64,0); break;
-            case "mid-left" : tile.getComponentWithIndex(0).frameOffset=Vector.create(0,32); break;
-            case "mid" : tile.getComponentWithIndex(0).frameOffset=Vector.create(32,32); break;
-            case "mid-right" : tile.getComponentWithIndex(0).frameOffset=Vector.create(64,32); break;
-            case "bot-left" : tile.getComponentWithIndex(0).frameOffset=Vector.create(0,64); break;
-            case "bot" : tile.getComponentWithIndex(0).frameOffset=Vector.create(32,64); break;
-            case "bot-right" : tile.getComponentWithIndex(0).frameOffset=Vector.create(64,64); break;
+            case "top" : tile.getComponentWithIndex(0).frameOffset=Vector.create(32,0);
+            const rb2=new Rigidbody(position); 
+            rb2.getColliderByIndex(0).setStatic(true);
+            rb2.getColliderByIndex(0).size=Vector.create(60,15);
+            rb2.getColliderByIndex(0).offset=Vector.create(0,-22);
+            tile.addComponent(rb2);
+            break;
+            case "top-right" :tile.getComponentWithIndex(0).frameOffset=Vector.create(64,0);
+            
+            break;
+            case "mid-left" : tile.getComponentWithIndex(0).frameOffset=Vector.create(0,32);
+            
+            break;
+            case "mid" : tile.getComponentWithIndex(0).frameOffset=Vector.create(32,32); 
+            
+            break;
+            case "mid-right" : tile.getComponentWithIndex(0).frameOffset=Vector.create(64,32); 
+            
+            break;
+            case "bot-left" : tile.getComponentWithIndex(0).frameOffset=Vector.create(0,64); 
+            
+            break;
+            case "bot" : tile.getComponentWithIndex(0).frameOffset=Vector.create(32,64);
+            
+            break;
+            case "bot-right" : tile.getComponentWithIndex(0).frameOffset=Vector.create(64,64);
+            
+            break;
             default : break;
         }
         return tile;

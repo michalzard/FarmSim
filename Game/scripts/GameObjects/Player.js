@@ -16,6 +16,13 @@ export default class Player extends GameObject{
         this.getComponentWithIndex(0).frameSize=Vector.create(16,16);
         this.addComponent(new MovementController());
         this.addComponent(new Rigidbody());    
+        const rb=this.getComponentWithIndex(2);
+        if(rb){
+            const firstCollider=rb.getColliderByIndex(0);
+            console.log(firstCollider);
+            firstCollider.size=Vector.create(50,15);
+            firstCollider.offset=Vector.create(0,15);
+        }
     }
     
 }
